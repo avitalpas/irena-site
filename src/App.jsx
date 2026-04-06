@@ -12,16 +12,6 @@ const LINKS = {
   youtubeChannel: "https://www.youtube.com/channel/UCFz5Nn6mBDch3T7QIwUqpSA",
 };
 
-const NEXT_RELEASE = {
-  dateLabel: "14.03",
-  titleLine: "New single is almost here",
-  emotionalLine:
-    "A warm, cinematic love story — the kind that stays with you after the last note.",
-  youtubeReminder: "https://youtu.be/yy-UaK7_rhI",
-  spotifyPresave: "https://distrokid.com/hyperfollow/97a8286/--",
-  songName: "Мажор моей души",
-};
-
 function Icon({ name }) {
   switch (name) {
     case "spotify":
@@ -148,6 +138,9 @@ export default function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
 
+  const [nextSong, setNextSong] = useState(null);
+  const [nextSongStatus, setNextSongStatus] = useState("loading"); // loading | ok | error
+
   const [emailOpen, setEmailOpen] = useState(false);
   const [reminderEmail, setReminderEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -155,6 +148,32 @@ export default function App() {
   const reminderInputRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadNextSong() {
+      try {
+        setNextSongStatus("loading");
+        const res = await fetch("/api/next-song");
+        const data = await res.json();
+
+        if (!res.ok || !data?.ok) throw new Error("bad_response");
+
+        if (!cancelled) {
+          setNextSong(data.song || null);
+          setNextSongStatus("ok");
+        }
+      } catch (e) {
+        if (!cancelled) setNextSongStatus("error");
+      }
+    }
+
+    loadNextSong();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!emailOpen) return;
@@ -178,13 +197,15 @@ export default function App() {
     try {
       setReminderStatus("sending");
 
+      const songTitle = nextSong?.title || "Unknown song";
+
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
           source: "אתר — Coming soon",
-          song: NEXT_RELEASE.songName,
+          song: songTitle,
           consent: true,
           consentVersion: "v1",
         }),
@@ -192,12 +213,25 @@ export default function App() {
 
       if (!res.ok) throw new Error("bad_response");
 
-      // נשאר פתוח + לא מאפס את הצ’קבוקס כדי שלא תצטרכי לסמן שוב אם עושים ניסויים
       setReminderStatus("success");
     } catch (err) {
       setReminderStatus("error");
     }
   }
+
+  const bannerTitleLine =
+    nextSongStatus === "ok" && nextSong?.title ? "New single is almost here" : "New single is almost here";
+
+  const bannerDate =
+    nextSongStatus === "ok" ? nextSong?.releaseShort || "—" : "…";
+
+  const ytUrl =
+    nextSongStatus === "ok" ? nextSong?.ytUrl || "#" : "#";
+
+  const spUrl =
+    nextSongStatus === "ok" ? nextSong?.spUrl || "#" : "#";
+
+  const disableButtons = nextSongStatus !== "ok";
 
   return (
     <div className={`page ${menuOpen ? "menuOpen" : ""}`}>
@@ -275,19 +309,39 @@ export default function App() {
               <div className="comingInfo">
                 <div className="comingTopLine">
                   <span className="comingTitle">Coming soon</span>
-                  <span className="comingDate">{NEXT_RELEASE.dateLabel}</span>
+                  <span className="comingDate">{bannerDate}</span>
                 </div>
 
-                <div className="comingSub">{NEXT_RELEASE.titleLine}</div>
+                <div className="comingSub">{bannerTitleLine}</div>
 
                 <div className="ctaAbove">Reminder:</div>
 
                 <div className="remindRow" role="group" aria-label="Choose reminder">
-                  <a className="remindBtn yt" href={NEXT_RELEASE.youtubeReminder} target="_blank" rel="noreferrer" aria-label="YouTube reminder">
+                  <a
+                    className="remindBtn yt"
+                    href={ytUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="YouTube reminder"
+                    aria-disabled={disableButtons ? "true" : "false"}
+                    onClick={(e) => {
+                      if (disableButtons || ytUrl === "#") e.preventDefault();
+                    }}
+                  >
                     <span className="remindIcon"><Icon name="youtube" /></span>
                   </a>
 
-                  <a className="remindBtn sp" href={NEXT_RELEASE.spotifyPresave} target="_blank" rel="noreferrer" aria-label="Spotify pre-save">
+                  <a
+                    className="remindBtn sp"
+                    href={spUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Spotify pre-save"
+                    aria-disabled={disableButtons ? "true" : "false"}
+                    onClick={(e) => {
+                      if (disableButtons || spUrl === "#") e.preventDefault();
+                    }}
+                  >
                     <span className="remindIcon"><Icon name="spotify" /></span>
                   </a>
 
@@ -323,8 +377,17 @@ export default function App() {
                         disabled={reminderStatus === "success"}
                       />
 
-                      <button className="emailBtn" type="submit" disabled={reminderStatus === "sending" || reminderStatus === "success"}>
-                        {reminderStatus === "sending" ? "Sending…" : reminderStatus === "success" ? "Saved" : "Get reminder"}
+                      <button
+                        className="emailBtn"
+                        type="submit"
+                        disabled={reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"}
+                        title={nextSongStatus !== "ok" ? "Loading song details…" : ""}
+                      >
+                        {reminderStatus === "sending"
+                          ? "Sending…"
+                          : reminderStatus === "success"
+                          ? "Saved"
+                          : "Get reminder"}
                       </button>
 
                       <label className="consentRow">
@@ -369,6 +432,12 @@ export default function App() {
                       >
                         Close
                       </button>
+
+                      {nextSongStatus === "error" && (
+                        <div className="emailMsg err">
+                          Couldn’t load next song details. Please refresh the page.
+                        </div>
+                      )}
                     </form>
                   </div>
                 )}
@@ -426,32 +495,31 @@ export default function App() {
 
         <h3 className="legalHeading">Privacy Policy</h3>
         <p>
-          This website is a promotional site for Irena Pasternak. We do not intentionally collect sensitive personal data.
+          This website is a promotional site for Irena Pasternak. We do not intentionally collect
+          sensitive personal data.
         </p>
         <p>
-          If you submit your email for a reminder, we store your email address to send release updates and reminders.
+          If you submit your email for a reminder, we store your email address to send release
+          updates and reminders.
         </p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Terms of Use</h3>
         <p>
-          All content on this website is protected by copyright and belongs to Irena Pasternak or is used with permission.
+          All content on this website is protected by copyright and belongs to Irena Pasternak or is
+          used with permission.
         </p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Cookies</h3>
-        <p>
-          The site may use cookies in the future if analytics or marketing tools are enabled.
-        </p>
+        <p>The site may use cookies in the future if analytics or marketing tools are enabled.</p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Accessibility Statement</h3>
-        <p>
-          If you experience accessibility issues, please contact us by email.
-        </p>
+        <p>If you experience accessibility issues, please contact us by email.</p>
       </Modal>
     </div>
   );

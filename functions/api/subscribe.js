@@ -44,11 +44,10 @@ export async function onRequestPost(context) {
 
     const emailRaw = (body.email || "").toString().trim();
     const source = (body.source || "אתר — Coming soon").toString().trim();
-    const song = (body.song || "Мажор моей души").toString().trim();
+    const song = (body.song || "").toString().trim(); // עכשיו מגיע מהאתר אוטומטית
     const consent = Boolean(body.consent);
     const consentVersion = (body.consentVersion || "v1").toString().trim();
 
-    // Log incoming (without exposing full email)
     console.log(tag, "incoming", {
       email: safeEmail(emailRaw),
       source,
@@ -60,6 +59,11 @@ export async function onRequestPost(context) {
     if (!emailRaw || !emailRaw.includes("@")) {
       console.log(tag, "validation fail: email");
       return jsonResponse(400, { ok: false, error: "Invalid email" });
+    }
+
+    if (!song) {
+      console.log(tag, "validation fail: song missing");
+      return jsonResponse(400, { ok: false, error: "Missing song" });
     }
 
     if (!consent) {
