@@ -1,0 +1,187 @@
+.nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 9, 6, 0.72) 0%,
+    rgba(13, 9, 6, 0.38) 45%,
+    rgba(13, 9, 6, 0.0) 100%
+  );
+}
+
+.navInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 18px 22px 26px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand {
+  justify-self: start;
+  text-decoration: none;
+  text-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+}
+
+.brandWithLogo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navLogo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 28px rgba(0,0,0,0.55));
+}
+
+.brandScript {
+  font-family: "Snell Roundhand", "Apple Chancery", "Bradley Hand", "Comic Sans MS", cursive;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.98);
+  transition: transform 240ms var(--easeOut), opacity 240ms var(--easeOut);
+}
+
+.brandScript:hover {
+  transform: translateY(-1px);
+  opacity: 0.94;
+}
+
+.navLinks {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navLinkBtn,
+.navLinks a {
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  background: transparent;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 200ms var(--easeOut), background 200ms var(--easeOut), opacity 200ms var(--easeOut);
+  text-shadow: 0 12px 34px rgba(0,0,0,0.55);
+}
+
+.navLinkBtn:hover,
+.navLinks a:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.navRight {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lang {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 12px 34px rgba(0,0,0,0.55);
+}
+
+.lang .active {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.65);
+  padding-bottom: 2px;
+}
+
+.lang .disabled {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  transition: transform 220ms var(--easeOut), background 220ms var(--easeOut), border-color 220ms var(--easeOut);
+  text-shadow: none;
+}
+
+.iconBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.burger {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .navInner {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand right"
+      "links links";
+    padding: 16px 16px 18px;
+  }
+
+  .brand { grid-area: brand; }
+  .navRight { grid-area: right; }
+  .navLinks { grid-area: links; justify-self: start; }
+
+  /* FIX: don't hide language on mobile */
+  .lang { display: flex; }
+
+  .burger { display: grid; }
+
+  .navLinks {
+    display: none;
+    width: 100%;
+    padding-top: 8px;
+    padding-bottom: 6px;
+  }
+
+  .navLinks.open {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .navLinkBtn,
+  .navLinks a {
+    width: 100%;
+    text-align: left;
+    background: rgba(13, 9, 6, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .brandScript { font-size: 26px; }
+  .navLogo { width: 24px; height: 24px; }
+
+  /* make languages more compact so they fit */
+  .lang { gap: 10px; font-size: 11px; }
+}
