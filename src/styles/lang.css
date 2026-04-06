@@ -1,4 +1,4 @@
-/* Language switcher (EN / RU / HE) */
+/* Language switcher (EN / RU / HE) — soft, minimal */
 
 .lang {
   display: inline-flex;
@@ -6,41 +6,43 @@
   gap: 10px;
 }
 
-/* הכפתורים שיצרנו ב-App.jsx הם <button class="langBtn ..."> */
 .langBtn {
-  height: 30px;
-  min-width: 44px;
-  padding: 0 12px;
-  border-radius: 10px;
+  height: 28px;
+  min-width: 40px;
+  padding: 0 10px;
+  border-radius: 999px;
 
-  border: 1px solid rgba(245, 237, 224, 0.22);
-  background: rgba(13, 9, 6, 0.22);
-  color: rgba(245, 237, 224, 0.86);
+  border: 1px solid rgba(245, 237, 224, 0.16);
+  background: rgba(13, 9, 6, 0.10);
+  color: rgba(245, 237, 224, 0.72);
 
-  font-weight: 900;
-  letter-spacing: 0.12em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 11px;
+  font-size: 10px;
 
   cursor: pointer;
   backdrop-filter: blur(10px);
 
-  transition: transform 220ms var(--easeOut),
-    background 220ms var(--easeOut),
-    border-color 220ms var(--easeOut),
-    color 220ms var(--easeOut);
+  transition:
+    transform 180ms var(--easeOut),
+    background 180ms var(--easeOut),
+    border-color 180ms var(--easeOut),
+    color 180ms var(--easeOut),
+    box-shadow 180ms var(--easeOut);
 }
 
 .langBtn:hover {
   transform: translateY(-1px);
-  background: rgba(13, 9, 6, 0.30);
-  border-color: rgba(245, 237, 224, 0.28);
+  background: rgba(13, 9, 6, 0.16);
+  border-color: rgba(245, 237, 224, 0.22);
 }
 
 .langBtn.active {
-  background: rgba(245, 237, 224, 0.88);
-  color: rgba(13, 9, 6, 0.92);
-  border-color: rgba(245, 237, 224, 0.70);
+  background: rgba(245, 237, 224, 0.20);
+  border-color: rgba(245, 237, 224, 0.30);
+  color: rgba(245, 237, 224, 0.92);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
 }
 
 .lang .disabled {
@@ -48,9 +50,9 @@
   cursor: not-allowed;
   user-select: none;
 
-  font-weight: 900;
-  letter-spacing: 0.12em;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-size: 11px;
-  color: rgba(245, 237, 224, 0.72);
+  font-size: 10px;
+  color: rgba(245, 237, 224, 0.62);
 }
