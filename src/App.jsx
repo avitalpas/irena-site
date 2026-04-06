@@ -62,10 +62,7 @@ function Icon({ name }) {
     case "menu":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-          <path
-            fill="currentColor"
-            d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z"
-          />
+          <path fill="currentColor" d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z" />
         </svg>
       );
     case "close":
@@ -137,7 +134,7 @@ function Modal({ open, title, onClose, children }) {
 
 function pick(copy, key, fallback) {
   const v = copy?.[key];
-  return (v && String(v).trim()) ? v : fallback;
+  return v && String(v).trim() ? v : fallback;
 }
 
 export default function App() {
@@ -147,6 +144,7 @@ export default function App() {
   const [legalOpen, setLegalOpen] = useState(false);
 
   const [lang, setLang] = useState("en"); // EN default for now
+  const [dir, setDir] = useState("ltr");
   const [copy, setCopy] = useState({});
   const [copyStatus, setCopyStatus] = useState("loading"); // loading | ok | error
 
@@ -162,6 +160,12 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
+    // set <html dir> for true RTL behavior
+    document.documentElement.setAttribute("dir", dir);
+    document.documentElement.setAttribute("lang", lang);
+  }, [dir, lang]);
+
+  useEffect(() => {
     let cancelled = false;
 
     async function loadCopy(currentLang) {
@@ -169,9 +173,12 @@ export default function App() {
         setCopyStatus("loading");
         const res = await fetch(`/api/site-copy?lang=${encodeURIComponent(currentLang)}`);
         const data = await res.json();
+
         if (!res.ok || !data?.ok) throw new Error("bad_copy");
+
         if (!cancelled) {
           setCopy(data.copy || {});
+          setDir(data.dir || (currentLang === "he" ? "rtl" : "ltr"));
           setCopyStatus("ok");
         }
       } catch (e) {
@@ -180,7 +187,9 @@ export default function App() {
     }
 
     loadCopy(lang);
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [lang]);
 
   useEffect(() => {
@@ -202,7 +211,9 @@ export default function App() {
     }
 
     loadNextSong();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -260,11 +271,8 @@ export default function App() {
       close: pick(copy, "email.close", "Close"),
       thanksTitle: pick(copy, "email.thanksTitle", "Thank you"),
       thanksText: pick(copy, "email.thanksText", "You’ll be among the first to hear the new release."),
-      consentText: pick(
-        copy,
-        "email.consentText",
-        "I agree to receive emails from Irena Pasternak, according to the site’s Privacy Policy."
-      ),
+      consentText: pick(copy, "email.consentText", "I agree to receive emails from Irena Pasternak, according to the site’s"),
+      privacyLinkText: pick(copy, "legal.privacyLinkText", "Privacy Policy"),
       legalTitle: pick(copy, "legal.title", "Legal"),
       lastUpdated: pick(copy, "legal.lastUpdated", "Last updated: 2026-04-06"),
       privacyTitle: pick(copy, "legal.privacyTitle", "Privacy Policy"),
@@ -308,25 +316,15 @@ export default function App() {
 
           <div className="navRight">
             <div className="lang" aria-label="Language">
-              <button
-                type="button"
-                className={`langBtn ${lang === "en" ? "active" : ""}`}
-                onClick={() => setLang("en")}
-                aria-label="English"
-              >
+              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
                 EN
               </button>
-
-              <button
-                type="button"
-                className={`langBtn ${lang === "ru" ? "active" : ""}`}
-                onClick={() => setLang("ru")}
-                aria-label="Russian"
-              >
+              <button type="button" className={`langBtn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>
                 RU
               </button>
-
-              <span className="disabled" title="Coming soon">HE</span>
+              <button type="button" className={`langBtn ${lang === "he" ? "active" : ""}`} onClick={() => setLang("he")}>
+                HE
+              </button>
             </div>
 
             <button
@@ -454,12 +452,8 @@ export default function App() {
                         />
                         <span className="consentText">
                           {t.consentText}{" "}
-                          <button
-                            className="consentLinkBtn"
-                            type="button"
-                            onClick={() => setLegalOpen(true)}
-                          >
-                            {pick(copy, "legal.privacyLinkText", "Privacy Policy")}
+                          <button className="consentLinkBtn" type="button" onClick={() => setLegalOpen(true)}>
+                            {t.privacyLinkText}
                           </button>
                           .
                         </span>

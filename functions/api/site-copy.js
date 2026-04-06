@@ -32,7 +32,9 @@ export async function onRequestGet(context) {
 
     const url = new URL(request.url);
     const lang = (url.searchParams.get("lang") || "en").toLowerCase();
+
     const wantRU = lang === "ru";
+    const wantHE = lang === "he";
 
     const notionUrl = `https://api.notion.com/v1/databases/${NOTION_SITE_COPY_DB_ID}/query`;
 
@@ -65,12 +67,22 @@ export async function onRequestGet(context) {
 
       const en = getPropText(props, "EN").trim();
       const ru = getPropText(props, "RU").trim();
+      const he = getPropText(props, "HE").trim();
 
-      const val = (wantRU ? ru : en) || en || ru || "";
+      let val = "";
+      if (wantHE) val = he || en || ru || "";
+      else if (wantRU) val = ru || en || he || "";
+      else val = en || ru || he || "";
+
       dict[k] = val;
     }
 
-    return jsonResponse(200, { ok: true, lang: wantRU ? "ru" : "en", copy: dict });
+    return jsonResponse(200, {
+      ok: true,
+      lang: wantHE ? "he" : wantRU ? "ru" : "en",
+      dir: wantHE ? "rtl" : "ltr",
+      copy: dict,
+    });
   } catch (e) {
     return jsonResponse(500, { ok: false, error: e?.message || "Server error" });
   }
