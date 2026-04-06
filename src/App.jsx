@@ -143,18 +143,18 @@ export default function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
 
-  const [lang, setLang] = useState("en"); // EN default for now
+  const [lang, setLang] = useState("ru"); // default RU
   const [dir, setDir] = useState("ltr");
   const [copy, setCopy] = useState({});
-  const [copyStatus, setCopyStatus] = useState("loading"); // loading | ok | error
+  const [copyStatus, setCopyStatus] = useState("loading");
 
   const [nextSong, setNextSong] = useState(null);
-  const [nextSongStatus, setNextSongStatus] = useState("loading"); // loading | ok | error
+  const [nextSongStatus, setNextSongStatus] = useState("loading");
 
   const [emailOpen, setEmailOpen] = useState(false);
   const [reminderEmail, setReminderEmail] = useState("");
   const [consent, setConsent] = useState(false);
-  const [reminderStatus, setReminderStatus] = useState("idle"); // idle | sending | success | error
+  const [reminderStatus, setReminderStatus] = useState("idle");
   const reminderInputRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
@@ -251,7 +251,7 @@ export default function App() {
 
       if (!res.ok) throw new Error("bad_response");
       setReminderStatus("success");
-    } catch (err) {
+    } catch {
       setReminderStatus("error");
     }
   }
@@ -323,31 +323,18 @@ export default function App() {
               {pick(copy, "nav.contact", "Contact")}
             </button>
 
-            {/* Mobile-only section inside burger */}
             <div className="navDivider" />
+            <div className="navSectionTitle">Language</div>
 
-            <div className="navSectionTitle">{pick(copy, "nav.languageTitle", "Language")}</div>
             <div className="lang langInMenu" aria-label="Language">
-              <button
-                type="button"
-                className={`langBtn ${lang === "en" ? "active" : ""}`}
-                onClick={() => setLang("en")}
-              >
-                EN
+              <button type="button" className={`langBtn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>
+                🇷🇺 RU
               </button>
-              <button
-                type="button"
-                className={`langBtn ${lang === "ru" ? "active" : ""}`}
-                onClick={() => setLang("ru")}
-              >
-                RU
+              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
+                🇺🇸 EN
               </button>
-              <button
-                type="button"
-                className={`langBtn ${lang === "he" ? "active" : ""}`}
-                onClick={() => setLang("he")}
-              >
-                HE
+              <button type="button" className={`langBtn ${lang === "he" ? "active" : ""}`} onClick={() => setLang("he")}>
+                🇮🇱 HE
               </button>
             </div>
 
@@ -366,16 +353,15 @@ export default function App() {
           </nav>
 
           <div className="navRight">
-            {/* desktop-only language switches; hidden on mobile via CSS */}
             <div className="lang langTop" aria-label="Language">
-              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
-                EN
-              </button>
               <button type="button" className={`langBtn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>
-                RU
+                🇷🇺 RU
+              </button>
+              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
+                🇺🇸 EN
               </button>
               <button type="button" className={`langBtn ${lang === "he" ? "active" : ""}`} onClick={() => setLang("he")}>
-                HE
+                🇮🇱 HE
               </button>
             </div>
 
@@ -386,28 +372,18 @@ export default function App() {
               aria-expanded={menuOpen ? "true" : "false"}
               onClick={() => setMenuOpen((v) => !v)}
             >
-              {menuOpen ? <Icon name="close" /> : <Icon name="menu" />}
+              <Icon name="menu" />
             </button>
           </div>
         </div>
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
-          <Icon name="spotify" />
-        </a>
-        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
-          <Icon name="youtube" />
-        </a>
-        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
-          <Icon name="tiktok" />
-        </a>
-        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
-          <Icon name="instagram" />
-        </a>
-        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
-          <Icon name="facebook" />
-        </a>
+        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify"><Icon name="spotify" /></a>
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube"><Icon name="youtube" /></a>
+        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok"><Icon name="tiktok" /></a>
+        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
+        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
       </aside>
 
       <main id="top">
@@ -440,9 +416,7 @@ export default function App() {
                       if (disableButtons || ytUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="youtube" />
-                    </span>
+                    <span className="remindIcon"><Icon name="youtube" /></span>
                   </a>
 
                   <a
@@ -456,9 +430,7 @@ export default function App() {
                       if (disableButtons || spUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="spotify" />
-                    </span>
+                    <span className="remindIcon"><Icon name="spotify" /></span>
                   </a>
 
                   <button
@@ -470,9 +442,7 @@ export default function App() {
                       setReminderStatus("idle");
                     }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="mail" />
-                    </span>
+                    <span className="remindIcon"><Icon name="mail" /></span>
                   </button>
                 </div>
 
@@ -498,9 +468,7 @@ export default function App() {
                       <button
                         className="emailBtn"
                         type="submit"
-                        disabled={
-                          reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"
-                        }
+                        disabled={reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"}
                       >
                         {reminderStatus === "sending"
                           ? t.sending
@@ -560,20 +528,11 @@ export default function App() {
             </div>
           </div>
 
-          <a
-            className="playPill playPillSmall"
-            href={LINKS.spotifyArtist}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open Spotify artist page"
-          >
-            <span className="playCircle">
-              <Icon name="play" />
-            </span>
+          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
+            <span className="playCircle"><Icon name="play" /></span>
             <span>{pick(copy, "cta.playSpotify", "Play on Spotify")}</span>
           </a>
 
-          {/* הוסר מהמסך במובייל — עובר לתפריט */}
           <div className="copyrightLine" aria-label="Copyright">
             © {new Date().getFullYear()} Irena Pasternak. All rights reserved.
           </div>
@@ -588,38 +547,19 @@ export default function App() {
       <Modal open={contactOpen} title={pick(copy, "contact.title", "Contact")} onClose={() => setContactOpen(false)}>
         <p className="muted">{pick(copy, "contact.p1", "For collaborations, licensing inquiries, and bookings:")}</p>
         <p className="muted">{pick(copy, "contact.emailLine", "Email: d0503366710@gmail.com")}</p>
-        <p>
-          {pick(copy, "contact.instagramLabel", "Instagram:")}{" "}
-          <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">
-            @irena_pasternak
-          </a>
-        </p>
-        <p>
-          {pick(copy, "contact.youtubeLabel", "YouTube:")}{" "}
-          <a className="inlineLink" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer">
-            {pick(copy, "contact.youtubeLinkText", "Channel")}
-          </a>
-        </p>
       </Modal>
 
       <Modal open={legalOpen} title={t.legalTitle} onClose={() => setLegalOpen(false)}>
         <p className="muted">{t.lastUpdated}</p>
-
         <h3 className="legalHeading">{t.privacyTitle}</h3>
         <p>{t.privacyBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.termsTitle}</h3>
         <p>{t.termsBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.cookiesTitle}</h3>
         <p>{t.cookiesBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.accTitle}</h3>
         <p>{t.accBody}</p>
       </Modal>
