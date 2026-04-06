@@ -9,8 +9,11 @@ const LINKS = {
   instagram: "https://www.instagram.com/irena_pasternak/",
   tiktok: "https://www.tiktok.com/@irena.pasternak?lang=en",
   facebook: "https://www.facebook.com/irena.pasternak.music/",
-  youtube: "https://www.youtube.com/channel/UCFz5Nn6mBDch3T7QIwUqpSA",
+  youtubeChannel: "https://www.youtube.com/channel/UCFz5Nn6mBDch3T7QIwUqpSA",
   email: "d0503366710@gmail.com",
+
+  nextYoutubeReminder: "https://youtu.be/yy-UaK7_rhI",
+  nextSpotifyReminder: "https://distrokid.com/hyperfollow/97a8286/--",
 };
 
 const NEXT_RELEASE = {
@@ -162,25 +165,11 @@ export default function App() {
               Home
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setBioOpen(true);
-                closeMenu();
-              }}
-            >
+            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
               Bio
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setContactOpen(true);
-                closeMenu();
-              }}
-            >
+            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
               Contact
             </button>
           </nav>
@@ -188,12 +177,8 @@ export default function App() {
           <div className="navRight">
             <div className="lang" aria-label="Language">
               <span className="active">EN</span>
-              <span className="disabled" title="Coming soon">
-                RU
-              </span>
-              <span className="disabled" title="Coming soon">
-                HE
-              </span>
+              <span className="disabled" title="Coming soon">RU</span>
+              <span className="disabled" title="Coming soon">HE</span>
             </div>
 
             <button
@@ -213,7 +198,7 @@ export default function App() {
         <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
           <Icon name="spotify" />
         </a>
-        <a className="socialIcon" href={LINKS.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
           <Icon name="youtube" />
         </a>
         <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
@@ -230,54 +215,40 @@ export default function App() {
       <main id="top">
         <section className="hero heroFull">
           <div className="comingCard" role="group" aria-label="Coming soon">
-            <div className="comingHeader">
-              <div className="comingTitle">COMING SOON</div>
-              <div className="comingDate">{NEXT_RELEASE.dateLabel}</div>
-              <div className="comingSub">{NEXT_RELEASE.titleLine}</div>
-              <div className="comingLine">{NEXT_RELEASE.emotionalLine}</div>
-            </div>
+            <div className="comingCompact">
+              <div className="comingCover">
+                <img className="coverImg" src={coverImg} alt="Next release cover" />
+              </div>
 
-            <div className="coverWrap" aria-label="Cover">
-              <img className="coverImg" src={coverImg} alt="Next release cover" />
-            </div>
+              <div className="comingInfo">
+                <div className="comingTopLine">
+                  <span className="comingTitle">Coming soon</span>
+                  <span className="comingDate">{NEXT_RELEASE.dateLabel}</span>
+                </div>
 
-            <div className="ctaAbove">Choose where you want the reminder:</div>
+                <div className="comingSub">{NEXT_RELEASE.titleLine}</div>
 
-            <div className="remindRow" role="group" aria-label="Choose reminder">
-              <a className="remindBtn yt" href={LINKS.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">
-                <span className="remindIcon">
-                  <Icon name="youtube" />
-                </span>
-              </a>
+                <div className="ctaAbove">Reminder:</div>
 
-              <a className="remindBtn sp" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
-                <span className="remindIcon">
-                  <Icon name="spotify" />
-                </span>
-              </a>
+                <div className="remindRow" role="group" aria-label="Choose reminder">
+                  <a className="remindBtn yt" href={LINKS.nextYoutubeReminder} target="_blank" rel="noreferrer" aria-label="YouTube">
+                    <span className="remindIcon"><Icon name="youtube" /></span>
+                  </a>
 
-              <a
-                className="remindBtn em"
-                href={`mailto:${LINKS.email}?subject=Irena%20Pasternak%20%E2%80%94%20Coming%20Soon%20Reminder`}
-                aria-label="Email"
-              >
-                <span className="remindIcon">
-                  <Icon name="mail" />
-                </span>
-              </a>
+                  <a className="remindBtn sp" href={LINKS.nextSpotifyReminder} target="_blank" rel="noreferrer" aria-label="Spotify">
+                    <span className="remindIcon"><Icon name="spotify" /></span>
+                  </a>
+
+                  <a className="remindBtn em" href={`mailto:${LINKS.email}?subject=Irena%20Pasternak%20%E2%80%94%20Coming%20Soon%20Reminder`} aria-label="Email">
+                    <span className="remindIcon"><Icon name="mail" /></span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 
-          <a
-            className="playPill playPillSmall"
-            href={LINKS.spotifyArtist}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open Spotify artist page"
-          >
-            <span className="playCircle">
-              <Icon name="play" />
-            </span>
+          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
+            <span className="playCircle"><Icon name="play" /></span>
             <span>Play on Spotify</span>
           </a>
 
@@ -303,84 +274,29 @@ export default function App() {
       <Modal open={contactOpen} title="Contact" onClose={() => setContactOpen(false)}>
         <p className="muted">For collaborations, licensing inquiries, and bookings:</p>
         <p>
-          Email:{" "}
-          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
-            {LINKS.email}
-          </a>
+          Email: <a className="inlineLink" href={`mailto:${LINKS.email}`}>{LINKS.email}</a>
         </p>
         <p>
-          Instagram:{" "}
-          <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">
-            @irena_pasternak
-          </a>
+          Instagram: <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">@irena_pasternak</a>
         </p>
         <p>
-          YouTube:{" "}
-          <a className="inlineLink" href={LINKS.youtube} target="_blank" rel="noreferrer">
-            Channel
-          </a>
+          YouTube: <a className="inlineLink" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer">Channel</a>
         </p>
       </Modal>
 
       <Modal open={legalOpen} title="Legal" onClose={() => setLegalOpen(false)}>
         <p className="muted">Last updated: 2026-04-06</p>
-
         <h3 className="legalHeading">Privacy Policy</h3>
-        <p>
-          This website is a promotional site for Irena Pasternak. We do not intentionally collect
-          sensitive personal data.
-        </p>
-        <p>
-          If you contact us by email, we will receive your email address and the information you
-          include in your message. We use it only to respond and for collaboration/licensing
-          inquiries.
-        </p>
-        <p>
-          Analytics/Cookies: If and when analytics tools are enabled (e.g., Google Analytics), the
-          site may use cookies or similar technologies. We will update this section and, if
-          required, show a cookie consent notice.
-        </p>
-
+        <p>...</p>
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">Terms of Use</h3>
-        <p>
-          All content on this website (including music, lyrics, images, and branding) is protected
-          by copyright and other intellectual property laws and belongs to Irena Pasternak or is
-          used with permission.
-        </p>
-        <p>
-          You may view and share the site for personal, non-commercial purposes. Any commercial use,
-          copying, distribution, or reuse of content requires prior written permission.
-        </p>
-        <p>
-          This website is provided “as is” without warranties. We are not responsible for external
-          sites linked from this website.
-        </p>
-
+        <p>...</p>
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">Cookies</h3>
-        <p>
-          Currently, this website does not require you to accept cookies to browse. If analytics or
-          marketing tools are enabled in the future, cookies may be used to understand performance
-          and improve the site.
-        </p>
-
+        <p>...</p>
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">Accessibility Statement</h3>
-        <p>
-          We aim to make this website accessible and usable. The site supports keyboard navigation,
-          clear focus states, and readable contrast where possible.
-        </p>
-        <p>
-          If you experience any accessibility issues, please contact{" "}
-          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
-            {LINKS.email}
-          </a>{" "}
-          and describe the problem (device/browser + screenshot if possible).
-        </p>
+        <p>...</p>
       </Modal>
     </div>
   );
