@@ -15,7 +15,8 @@ const LINKS = {
 const NEXT_RELEASE = {
   dateLabel: "14.03",
   titleLine: "New single is almost here",
-  emotionalLine: "A warm, cinematic love story — the kind that stays with you after the last note.",
+  emotionalLine:
+    "A warm, cinematic love story — the kind that stays with you after the last note.",
   youtubeReminder: "https://youtu.be/yy-UaK7_rhI",
   spotifyPresave: "https://distrokid.com/hyperfollow/97a8286/--",
   songName: "Мажор моей души",
@@ -28,7 +29,7 @@ function Icon({ name }) {
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
           <path
             fill="currentColor"
-            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm4.592 14.392c-.19.31-.594.407-.9.217-2.467-1.51-5.574-1.852-9.234-1.02-.357.083-.714-.14-.796-.497-.083-.357.14-.714.497-.796 4.014-.91 7.46-.514 10.23 1.187.31.19.407.594.217.909Zm1.286-2.86c-.24.388-.748.51-1.136.27-2.825-1.737-7.13-2.24-10.47-1.222-.44.133-.904-.115-1.038-.554-.133-.44.115-.904.554-1.038 3.814-1.16 8.553-.6 11.81 1.4.388.24.51.748.27 1.145Zm.11-2.976c-3.387-2.013-8.98-2.2-12.214-1.218-.529.16-1.088-.14-1.248-.668-.16-.529.14-1.088.668-1.248 3.71-1.127 9.86-.91 13.76 1.41.476.283.633.898.35 1.374-.283.476-.898.633-1.374.35Z"
+            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm4.592 14.392c-.19.31-.594.407-.9.217-2.467-1.51-5.574-1.852-9.234-1.02-.357.083-.714-.140-.796-.497-.083-.357.14-.714.497-.796 4.014-.91 7.46-.514 10.23 1.187.31.19.407.594.217.909Zm1.286-2.86c-.24.388-.748.51-1.136.27-2.825-1.737-7.13-2.24-10.47-1.222-.44.133-.904-.115-1.038-.554-.133-.44.115-.904.554-1.038 3.814-1.16 8.553-.6 11.81 1.4.388.24.51.748.27 1.145Zm.11-2.976c-3.387-2.013-8.98-2.2-12.214-1.218-.529.16-1.088-.14-1.248-.668-.16-.529.14-1.088.668-1.248 3.71-1.127 9.86-.91 13.76 1.41.476.283.633.898.35 1.374-.283.476-.898.633-1.374.35Z"
           />
         </svg>
       );
@@ -184,7 +185,9 @@ export default function App() {
           email,
           source: "אתר — Coming soon",
           song: NEXT_RELEASE.songName,
-          notes: "Consent: yes",
+
+          consent: true,
+          consentVersion: "v1",
         }),
       });
 
@@ -217,25 +220,11 @@ export default function App() {
               Home
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setBioOpen(true);
-                closeMenu();
-              }}
-            >
+            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
               Bio
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setContactOpen(true);
-                closeMenu();
-              }}
-            >
+            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
               Contact
             </button>
           </nav>
@@ -243,12 +232,8 @@ export default function App() {
           <div className="navRight">
             <div className="lang" aria-label="Language">
               <span className="active">EN</span>
-              <span className="disabled" title="Coming soon">
-                RU
-              </span>
-              <span className="disabled" title="Coming soon">
-                HE
-              </span>
+              <span className="disabled" title="Coming soon">RU</span>
+              <span className="disabled" title="Coming soon">HE</span>
             </div>
 
             <button
@@ -265,21 +250,11 @@ export default function App() {
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
-          <Icon name="spotify" />
-        </a>
-        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
-          <Icon name="youtube" />
-        </a>
-        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
-          <Icon name="tiktok" />
-        </a>
-        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
-          <Icon name="instagram" />
-        </a>
-        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
-          <Icon name="facebook" />
-        </a>
+        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify"><Icon name="spotify" /></a>
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube"><Icon name="youtube" /></a>
+        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok"><Icon name="tiktok" /></a>
+        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
+        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
       </aside>
 
       <main id="top">
@@ -302,15 +277,11 @@ export default function App() {
 
                 <div className="remindRow" role="group" aria-label="Choose reminder">
                   <a className="remindBtn yt" href={NEXT_RELEASE.youtubeReminder} target="_blank" rel="noreferrer" aria-label="YouTube reminder">
-                    <span className="remindIcon">
-                      <Icon name="youtube" />
-                    </span>
+                    <span className="remindIcon"><Icon name="youtube" /></span>
                   </a>
 
                   <a className="remindBtn sp" href={NEXT_RELEASE.spotifyPresave} target="_blank" rel="noreferrer" aria-label="Spotify pre-save">
-                    <span className="remindIcon">
-                      <Icon name="spotify" />
-                    </span>
+                    <span className="remindIcon"><Icon name="spotify" /></span>
                   </a>
 
                   <button
@@ -322,9 +293,7 @@ export default function App() {
                       setReminderStatus("idle");
                     }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="mail" />
-                    </span>
+                    <span className="remindIcon"><Icon name="mail" /></span>
                   </button>
                 </div>
 
@@ -360,19 +329,19 @@ export default function App() {
                         />
                         <span className="consentText">
                           I agree to receive emails from Irena Pasternak, according to the site’s{" "}
-                          <button
-                            className="consentLinkBtn"
-                            type="button"
-                            onClick={() => setLegalOpen(true)}
-                          >
+                          <button className="consentLinkBtn" type="button" onClick={() => setLegalOpen(true)}>
                             Privacy Policy
                           </button>
                           .
                         </span>
                       </label>
 
-                      {reminderStatus === "success" && <div className="emailMsg ok">You’re in. See you on release day.</div>}
-                      {reminderStatus === "error" && <div className="emailMsg err">Please check the box and try again.</div>}
+                      {reminderStatus === "success" && (
+                        <div className="emailMsg ok">You’re in. See you on release day.</div>
+                      )}
+                      {reminderStatus === "error" && (
+                        <div className="emailMsg err">Something went wrong. Please try again.</div>
+                      )}
 
                       <button
                         className="emailClose"
@@ -393,9 +362,7 @@ export default function App() {
           </div>
 
           <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
-            <span className="playCircle">
-              <Icon name="play" />
-            </span>
+            <span className="playCircle"><Icon name="play" /></span>
             <span>Play on Spotify</span>
           </a>
 

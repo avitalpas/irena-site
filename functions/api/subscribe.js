@@ -1,56 +1,95 @@
+function jsonResponse(status, payload) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function requireEnv(env, key) {
+  const val = env[key];
+  if (!val) {
+    const msg = `Missing env var: ${key}`;
+    console.log("[subscribe] CONFIG ERROR:", msg);
+    throw new Error(msg);
+  }
+  return val;
+}
+
+function safeEmail(email) {
+  if (!email) return "";
+  const [a, b] = String(email).split("@");
+  if (!b) return String(email).slice(0, 2) + "***";
+  return `${(a || "").slice(0, 2)}***@${b}`;
+}
+
 export async function onRequestPost(context) {
+  const reqId = crypto?.randomUUID?.() || String(Date.now());
+  const tag = `[subscribe][${reqId}]`;
+
+  console.log(tag, "start");
+
   try {
     const { request, env } = context;
 
-    const NOTION_TOKEN = env.NOTION_TOKEN;
-    const NOTION_DB_URL = env.NOTION_DB_URL;
+    const NOTION_TOKEN = requireEnv(env, "NOTION_TOKEN");
+    const NOTION_DB_ID = requireEnv(env, "NOTION_DB_ID");
 
-    if (!NOTION_TOKEN || !NOTION_DB_URL) {
-      return new Response(JSON.stringify({ ok: false, error: "Missing server configuration" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.log(tag, "bad json body");
+      return jsonResponse(400, { ok: false, error: "Invalid JSON body" });
     }
 
-    const body = await request.json().catch(() => ({}));
     const emailRaw = (body.email || "").toString().trim();
     const source = (body.source || "אתר — Coming soon").toString().trim();
     const song = (body.song || "Мажор моей души").toString().trim();
-    const notes = (body.notes || "").toString().trim();
+    const consent = Boolean(body.consent);
+    const consentVersion = (body.consentVersion || "v1").toString().trim();
 
-    if (!emailRaw || !emailRaw.includes("@")) {
-      return new Response(JSON.stringify({ ok: false, error: "Invalid email" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // Load database to get dataSourceUrl and property ids (so we don't guess them)
-    const dbRes = await fetch(`https://api.notion.com/v1/databases/${encodeURIComponent(NOTION_DB_URL)}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${NOTION_TOKEN}`,
-        "Notion-Version": "2022-06-28",
-      },
+    // Log incoming (without exposing full email)
+    console.log(tag, "incoming", {
+      email: safeEmail(emailRaw),
+      source,
+      song,
+      consent,
+      consentVersion,
     });
 
-    if (!dbRes.ok) {
-      const t = await dbRes.text();
-      return new Response(JSON.stringify({ ok: false, error: "Failed to load database", details: t }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+    if (!emailRaw || !emailRaw.includes("@")) {
+      console.log(tag, "validation fail: email");
+      return jsonResponse(400, { ok: false, error: "Invalid email" });
     }
 
-    const db = await dbRes.json();
-    const databaseId = db.id;
+    if (!consent) {
+      console.log(tag, "validation fail: consent");
+      return jsonResponse(400, { ok: false, error: "Consent required" });
+    }
 
-    // Create page in database
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    const isoDate = `${yyyy}-${mm}-${dd}`;
+    const nowIso = new Date().toISOString();
+    console.log(tag, "timestamp", nowIso);
+
+    const notionPayload = {
+      parent: { database_id: NOTION_DB_ID },
+      properties: {
+        "אימייל": { title: [{ text: { content: emailRaw } }] },
+        "נרשם ב": { date: { start: nowIso } },
+        "מקור": { select: { name: source } },
+        "שיר": { select: { name: song } },
+
+        "הסכמה לדיוור": { checkbox: true },
+        "מועד הסכמה": { date: { start: nowIso } },
+        "גרסת נוסח הסכמה": {
+          rich_text: [{ text: { content: consentVersion } }],
+        },
+      },
+    };
+
+    console.log(tag, "notion request prepared", {
+      database_id: NOTION_DB_ID,
+      props: Object.keys(notionPayload.properties),
+    });
 
     const pageRes = await fetch("https://api.notion.com/v1/pages", {
       method: "POST",
@@ -59,34 +98,28 @@ export async function onRequestPost(context) {
         "Notion-Version": "2022-06-28",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        parent: { database_id: databaseId },
-        properties: {
-          "אימייל": { title: [{ text: { content: emailRaw } }] },
-          "נרשם ב": { date: { start: isoDate } },
-          "מקור": { select: { name: source } },
-          "שיר": { select: { name: song } },
-          "הערות": notes ? { rich_text: [{ text: { content: notes } }] } : { rich_text: [] },
-        },
-      }),
+      body: JSON.stringify(notionPayload),
     });
 
+    console.log(tag, "notion response status", pageRes.status);
+
     if (!pageRes.ok) {
-      const t = await pageRes.text();
-      return new Response(JSON.stringify({ ok: false, error: "Failed to create row", details: t }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
+      const text = await pageRes.text().catch(() => "");
+      console.log(tag, "notion error body", text);
+      return jsonResponse(500, {
+        ok: false,
+        error: "Notion API error",
+        status: pageRes.status,
+        details: text,
       });
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    const pageJson = await pageRes.json().catch(() => null);
+    console.log(tag, "success", { pageId: pageJson?.id });
+
+    return jsonResponse(200, { ok: true, pageId: pageJson?.id });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: "Server error" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.log(tag, "server error", e?.message || e);
+    return jsonResponse(500, { ok: false, error: e?.message || "Server error" });
   }
 }
