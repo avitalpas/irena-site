@@ -143,7 +143,7 @@ export default function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
 
-  const [lang, setLang] = useState("ru"); // default RU
+  const [lang, setLang] = useState("ru"); // ברירת מחדל: רוסית
   const [dir, setDir] = useState("ltr");
   const [copy, setCopy] = useState({});
   const [copyStatus, setCopyStatus] = useState("loading");
@@ -158,6 +158,11 @@ export default function App() {
   const reminderInputRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
+
+  function setLangFromMenu(nextLang) {
+    setLang(nextLang);
+    closeMenu();
+  }
 
   useEffect(() => {
     document.documentElement.setAttribute("dir", dir);
@@ -224,7 +229,6 @@ export default function App() {
 
   async function submitReminder(e) {
     e.preventDefault();
-
     const email = reminderEmail.trim();
     if (!email) return;
 
@@ -323,33 +327,50 @@ export default function App() {
               {pick(copy, "nav.contact", "Contact")}
             </button>
 
-            <div className="navDivider" />
-            <div className="navSectionTitle">Language</div>
+            {/* שפות + משפטי יוצגו רק כשההמבורגר פתוח */}
+            {menuOpen && (
+              <>
+                <div className="navDivider" />
+                <div className="navSectionTitle">Language</div>
 
-            <div className="lang langInMenu" aria-label="Language">
-              <button type="button" className={`langBtn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>
-                🇷🇺 RU
-              </button>
-              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
-                🇺🇸 EN
-              </button>
-              <button type="button" className={`langBtn ${lang === "he" ? "active" : ""}`} onClick={() => setLang("he")}>
-                🇮🇱 HE
-              </button>
-            </div>
+                <div className="lang langInMenu" aria-label="Language">
+                  <button
+                    type="button"
+                    className={`langBtn ${lang === "ru" ? "active" : ""}`}
+                    onClick={() => setLangFromMenu("ru")}
+                  >
+                    🇷🇺 RU
+                  </button>
+                  <button
+                    type="button"
+                    className={`langBtn ${lang === "en" ? "active" : ""}`}
+                    onClick={() => setLangFromMenu("en")}
+                  >
+                    🇺🇸 EN
+                  </button>
+                  <button
+                    type="button"
+                    className={`langBtn ${lang === "he" ? "active" : ""}`}
+                    onClick={() => setLangFromMenu("he")}
+                  >
+                    🇮🇱 HE
+                  </button>
+                </div>
 
-            <div className="navDivider" />
+                <div className="navDivider" />
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setLegalOpen(true);
-                closeMenu();
-              }}
-            >
-              {t.legalTitle}
-            </button>
+                <button
+                  className="navLinkBtn"
+                  type="button"
+                  onClick={() => {
+                    setLegalOpen(true);
+                    closeMenu();
+                  }}
+                >
+                  {t.legalTitle}
+                </button>
+              </>
+            )}
           </nav>
 
           <div className="navRight">
@@ -379,11 +400,21 @@ export default function App() {
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify"><Icon name="spotify" /></a>
-        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube"><Icon name="youtube" /></a>
-        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok"><Icon name="tiktok" /></a>
-        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
-        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
+        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
+          <Icon name="spotify" />
+        </a>
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
+          <Icon name="youtube" />
+        </a>
+        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
+          <Icon name="tiktok" />
+        </a>
+        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+          <Icon name="instagram" />
+        </a>
+        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
+          <Icon name="facebook" />
+        </a>
       </aside>
 
       <main id="top">
@@ -416,7 +447,9 @@ export default function App() {
                       if (disableButtons || ytUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon"><Icon name="youtube" /></span>
+                    <span className="remindIcon">
+                      <Icon name="youtube" />
+                    </span>
                   </a>
 
                   <a
@@ -430,7 +463,9 @@ export default function App() {
                       if (disableButtons || spUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon"><Icon name="spotify" /></span>
+                    <span className="remindIcon">
+                      <Icon name="spotify" />
+                    </span>
                   </a>
 
                   <button
@@ -442,7 +477,9 @@ export default function App() {
                       setReminderStatus("idle");
                     }}
                   >
-                    <span className="remindIcon"><Icon name="mail" /></span>
+                    <span className="remindIcon">
+                      <Icon name="mail" />
+                    </span>
                   </button>
                 </div>
 
@@ -503,7 +540,9 @@ export default function App() {
                       )}
 
                       {reminderStatus === "error" && (
-                        <div className="emailMsg err">{pick(copy, "email.error", "Something went wrong. Please try again.")}</div>
+                        <div className="emailMsg err">
+                          {pick(copy, "email.error", "Something went wrong. Please try again.")}
+                        </div>
                       )}
 
                       <button
@@ -519,7 +558,9 @@ export default function App() {
                       </button>
 
                       {copyStatus === "error" && (
-                        <div className="emailMsg err">{pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}</div>
+                        <div className="emailMsg err">
+                          {pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}
+                        </div>
                       )}
                     </form>
                   </div>
@@ -528,8 +569,16 @@ export default function App() {
             </div>
           </div>
 
-          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
-            <span className="playCircle"><Icon name="play" /></span>
+          <a
+            className="playPill playPillSmall"
+            href={LINKS.spotifyArtist}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Spotify artist page"
+          >
+            <span className="playCircle">
+              <Icon name="play" />
+            </span>
             <span>{pick(copy, "cta.playSpotify", "Play on Spotify")}</span>
           </a>
 
@@ -551,15 +600,22 @@ export default function App() {
 
       <Modal open={legalOpen} title={t.legalTitle} onClose={() => setLegalOpen(false)}>
         <p className="muted">{t.lastUpdated}</p>
+
         <h3 className="legalHeading">{t.privacyTitle}</h3>
         <p>{t.privacyBody}</p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">{t.termsTitle}</h3>
         <p>{t.termsBody}</p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">{t.cookiesTitle}</h3>
         <p>{t.cookiesBody}</p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">{t.accTitle}</h3>
         <p>{t.accBody}</p>
       </Modal>

@@ -1,35 +1,33 @@
 /* Language switcher (EN / RU / HE) — soft, minimal */
 
+/* עיצוב בלבד — בלי להגדיר display שמפריע ל-breakpoints.
+   התצוגה (מי מוסתר/מוצג) נשלטת ב-layout.css */
 .lang {
-  display: inline-flex;
   align-items: center;
   gap: 10px;
 }
 
 .langBtn {
   height: 28px;
-  min-width: 40px;
+  min-width: 44px;
   padding: 0 10px;
   border-radius: 999px;
-
   border: 1px solid rgba(245, 237, 224, 0.16);
   background: rgba(13, 9, 6, 0.10);
   color: rgba(245, 237, 224, 0.72);
-
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 10px;
-
   cursor: pointer;
   backdrop-filter: blur(10px);
-
   transition:
     transform 180ms var(--easeOut),
     background 180ms var(--easeOut),
     border-color 180ms var(--easeOut),
     color 180ms var(--easeOut),
     box-shadow 180ms var(--easeOut);
+  white-space: nowrap; /* כדי שהדגל+קוד לא ישברו */
 }
 
 .langBtn:hover {
@@ -49,7 +47,6 @@
   opacity: 0.35;
   cursor: not-allowed;
   user-select: none;
-
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
