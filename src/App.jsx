@@ -160,7 +160,6 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
-    // set <html dir> for true RTL behavior
     document.documentElement.setAttribute("dir", dir);
     document.documentElement.setAttribute("lang", lang);
   }, [dir, lang]);
@@ -173,7 +172,6 @@ export default function App() {
         setCopyStatus("loading");
         const res = await fetch(`/api/site-copy?lang=${encodeURIComponent(currentLang)}`);
         const data = await res.json();
-
         if (!res.ok || !data?.ok) throw new Error("bad_copy");
 
         if (!cancelled) {
@@ -237,7 +235,6 @@ export default function App() {
 
     try {
       setReminderStatus("sending");
-
       const songTitle = nextSong?.title || "";
 
       const res = await fetch("/api/subscribe", {
@@ -253,7 +250,6 @@ export default function App() {
       });
 
       if (!res.ok) throw new Error("bad_response");
-
       setReminderStatus("success");
     } catch (err) {
       setReminderStatus("error");
@@ -305,17 +301,73 @@ export default function App() {
               {pick(copy, "nav.home", "Home")}
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setBioOpen(true);
+                closeMenu();
+              }}
+            >
               {pick(copy, "nav.bio", "Bio")}
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setContactOpen(true);
+                closeMenu();
+              }}
+            >
               {pick(copy, "nav.contact", "Contact")}
+            </button>
+
+            {/* Mobile-only section inside burger */}
+            <div className="navDivider" />
+
+            <div className="navSectionTitle">{pick(copy, "nav.languageTitle", "Language")}</div>
+            <div className="lang langInMenu" aria-label="Language">
+              <button
+                type="button"
+                className={`langBtn ${lang === "en" ? "active" : ""}`}
+                onClick={() => setLang("en")}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                className={`langBtn ${lang === "ru" ? "active" : ""}`}
+                onClick={() => setLang("ru")}
+              >
+                RU
+              </button>
+              <button
+                type="button"
+                className={`langBtn ${lang === "he" ? "active" : ""}`}
+                onClick={() => setLang("he")}
+              >
+                HE
+              </button>
+            </div>
+
+            <div className="navDivider" />
+
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setLegalOpen(true);
+                closeMenu();
+              }}
+            >
+              {t.legalTitle}
             </button>
           </nav>
 
           <div className="navRight">
-            <div className="lang" aria-label="Language">
+            {/* desktop-only language switches; hidden on mobile via CSS */}
+            <div className="lang langTop" aria-label="Language">
               <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
                 EN
               </button>
@@ -334,18 +386,28 @@ export default function App() {
               aria-expanded={menuOpen ? "true" : "false"}
               onClick={() => setMenuOpen((v) => !v)}
             >
-              <Icon name="menu" />
+              {menuOpen ? <Icon name="close" /> : <Icon name="menu" />}
             </button>
           </div>
         </div>
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify"><Icon name="spotify" /></a>
-        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube"><Icon name="youtube" /></a>
-        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok"><Icon name="tiktok" /></a>
-        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram"><Icon name="instagram" /></a>
-        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Icon name="facebook" /></a>
+        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
+          <Icon name="spotify" />
+        </a>
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
+          <Icon name="youtube" />
+        </a>
+        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
+          <Icon name="tiktok" />
+        </a>
+        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+          <Icon name="instagram" />
+        </a>
+        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
+          <Icon name="facebook" />
+        </a>
       </aside>
 
       <main id="top">
@@ -362,9 +424,7 @@ export default function App() {
                   <span className="comingDate">{bannerDate}</span>
                 </div>
 
-                <div className="comingSub">
-                  {pick(copy, "banner.subtitle", "New single is almost here")}
-                </div>
+                <div className="comingSub">{pick(copy, "banner.subtitle", "New single is almost here")}</div>
 
                 <div className="ctaAbove">{t.reminder}</div>
 
@@ -380,7 +440,9 @@ export default function App() {
                       if (disableButtons || ytUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon"><Icon name="youtube" /></span>
+                    <span className="remindIcon">
+                      <Icon name="youtube" />
+                    </span>
                   </a>
 
                   <a
@@ -394,7 +456,9 @@ export default function App() {
                       if (disableButtons || spUrl === "#") e.preventDefault();
                     }}
                   >
-                    <span className="remindIcon"><Icon name="spotify" /></span>
+                    <span className="remindIcon">
+                      <Icon name="spotify" />
+                    </span>
                   </a>
 
                   <button
@@ -406,7 +470,9 @@ export default function App() {
                       setReminderStatus("idle");
                     }}
                   >
-                    <span className="remindIcon"><Icon name="mail" /></span>
+                    <span className="remindIcon">
+                      <Icon name="mail" />
+                    </span>
                   </button>
                 </div>
 
@@ -432,7 +498,9 @@ export default function App() {
                       <button
                         className="emailBtn"
                         type="submit"
-                        disabled={reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"}
+                        disabled={
+                          reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"
+                        }
                       >
                         {reminderStatus === "sending"
                           ? t.sending
@@ -467,9 +535,7 @@ export default function App() {
                       )}
 
                       {reminderStatus === "error" && (
-                        <div className="emailMsg err">
-                          {pick(copy, "email.error", "Something went wrong. Please try again.")}
-                        </div>
+                        <div className="emailMsg err">{pick(copy, "email.error", "Something went wrong. Please try again.")}</div>
                       )}
 
                       <button
@@ -485,9 +551,7 @@ export default function App() {
                       </button>
 
                       {copyStatus === "error" && (
-                        <div className="emailMsg err">
-                          {pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}
-                        </div>
+                        <div className="emailMsg err">{pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}</div>
                       )}
                     </form>
                   </div>
@@ -496,17 +560,20 @@ export default function App() {
             </div>
           </div>
 
-          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
-            <span className="playCircle"><Icon name="play" /></span>
+          <a
+            className="playPill playPillSmall"
+            href={LINKS.spotifyArtist}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Spotify artist page"
+          >
+            <span className="playCircle">
+              <Icon name="play" />
+            </span>
             <span>{pick(copy, "cta.playSpotify", "Play on Spotify")}</span>
           </a>
 
-          <div className="legalPills" aria-label="Legal links">
-            <button className="legalBtn" type="button" onClick={() => setLegalOpen(true)}>
-              {t.legalTitle}
-            </button>
-          </div>
-
+          {/* הוסר מהמסך במובייל — עובר לתפריט */}
           <div className="copyrightLine" aria-label="Copyright">
             © {new Date().getFullYear()} Irena Pasternak. All rights reserved.
           </div>
