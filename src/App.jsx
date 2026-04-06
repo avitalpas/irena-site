@@ -158,7 +158,12 @@ export default function App() {
     <div className={`page ${menuOpen ? "menuOpen" : ""}`}>
       <header className={`nav ${menuOpen ? "menuIsOpen" : ""}`}>
         <div className="navInner">
-          <a className="brand brandWithLogo" href="#top" onClick={closeMenu} aria-label="Home">
+          <a
+            className="brand brandWithLogo"
+            href="#top"
+            onClick={closeMenu}
+            aria-label="Home"
+          >
             <img className="navLogo" src={logoImg} alt="" />
             <span className="brandScript">Irena Pasternak</span>
           </a>
@@ -216,19 +221,49 @@ export default function App() {
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
+        <a
+          className="socialIcon"
+          href={LINKS.spotifyArtist}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Spotify"
+        >
           <Icon name="spotify" />
         </a>
-        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
+        <a
+          className="socialIcon"
+          href={LINKS.youtubeChannel}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="YouTube"
+        >
           <Icon name="youtube" />
         </a>
-        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
+        <a
+          className="socialIcon"
+          href={LINKS.tiktok}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="TikTok"
+        >
           <Icon name="tiktok" />
         </a>
-        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
+        <a
+          className="socialIcon"
+          href={LINKS.instagram}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Instagram"
+        >
           <Icon name="instagram" />
         </a>
-        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
+        <a
+          className="socialIcon"
+          href={LINKS.facebook}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Facebook"
+        >
           <Icon name="facebook" />
         </a>
       </aside>
@@ -282,7 +317,9 @@ export default function App() {
                       NEXT_RELEASE.dateLabel
                     )})&body=Hi!%0A%0APlease%20send%20me%20a%20reminder%20when%20the%20new%20single%20drops.%0A%0AYouTube%20reminder:%20${encodeURIComponent(
                       LINKS.nextYoutubeReminder
-                    )}%0ASpotify%20pre-save:%20${encodeURIComponent(LINKS.nextSpotifyReminder)}%0A`}
+                    )}%0ASpotify%20pre-save:%20${encodeURIComponent(
+                      LINKS.nextSpotifyReminder
+                    )}%0A`}
                     aria-label="Email reminder"
                   >
                     <span className="remindIcon">
@@ -311,6 +348,10 @@ export default function App() {
             <button className="legalBtn" type="button" onClick={() => setLegalOpen(true)}>
               Legal
             </button>
+          </div>
+
+          <div className="copyrightLine" aria-label="Copyright">
+            © {new Date().getFullYear()} Irena Pasternak. All rights reserved.
           </div>
         </section>
       </main>
@@ -350,17 +391,59 @@ export default function App() {
 
       <Modal open={legalOpen} title="Legal" onClose={() => setLegalOpen(false)}>
         <p className="muted">Last updated: 2026-04-06</p>
+
         <h3 className="legalHeading">Privacy Policy</h3>
-        <p>...</p>
+        <p>
+          This website is a promotional site for Irena Pasternak. We do not intentionally collect
+          sensitive personal data.
+        </p>
+        <p>
+          If you contact us by email, we will receive your email address and the information you
+          include in your message. We use it only to respond and for collaboration/licensing
+          inquiries.
+        </p>
+        <p>
+          Analytics and cookies: If analytics tools are enabled in the future, the site may use
+          cookies or similar technologies to measure performance and improve the experience. This
+          policy will be updated accordingly.
+        </p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">Terms of Use</h3>
-        <p>...</p>
+        <p>
+          All content on this website (including music, lyrics, images, and branding) is protected
+          by copyright and other intellectual property laws and belongs to Irena Pasternak or is
+          used with permission.
+        </p>
+        <p>
+          You may view and share this website for personal, non-commercial use. Any commercial use,
+          copying, distribution, or reuse of content requires prior written permission.
+        </p>
+        <p>
+          This website is provided “as is” without warranties. We are not responsible for external
+          sites linked from this website.
+        </p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">Cookies</h3>
-        <p>...</p>
+        <p>
+          The site may use cookies in the future if analytics or marketing tools are enabled. If
+          that happens, we will update this section and, if required, show a cookie notice.
+        </p>
+
         <hr className="legalDivider" />
+
         <h3 className="legalHeading">Accessibility Statement</h3>
-        <p>...</p>
+        <p>
+          We aim to make this website accessible and usable. If you experience any accessibility
+          issues, please contact{" "}
+          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
+            {LINKS.email}
+          </a>{" "}
+          and describe the issue (device, browser, and a screenshot if possible).
+        </p>
       </Modal>
     </div>
   );
