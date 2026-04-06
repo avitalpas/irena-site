@@ -29,7 +29,7 @@ function Icon({ name }) {
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
           <path
             fill="currentColor"
-            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm4.592 14.392c-.19.31-.594.407-.9.217-2.467-1.51-5.574-1.852-9.234-1.02-.357.083-.714-.140-.796-.497-.083-.357.14-.714.497-.796 4.014-.91 7.46-.514 10.23 1.187.31.19.407.594.217.909Zm1.286-2.86c-.24.388-.748.51-1.136.27-2.825-1.737-7.13-2.24-10.47-1.222-.44.133-.904-.115-1.038-.554-.133-.44.115-.904.554-1.038 3.814-1.16 8.553-.6 11.81 1.4.388.24.51.748.27 1.145Zm.11-2.976c-3.387-2.013-8.98-2.2-12.214-1.218-.529.16-1.088-.14-1.248-.668-.16-.529.14-1.088.668-1.248 3.71-1.127 9.86-.91 13.76 1.41.476.283.633.898.35 1.374-.283.476-.898.633-1.374.35Z"
+            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2Zm4.592 14.392c-.19.31-.594.407-.9.217-2.467-1.51-5.574-1.852-9.234-1.02-.357.083-.714-.14-.796-.497-.083-.357.14-.714.497-.796 4.014-.91 7.46-.514 10.23 1.187.31.19.407.594.217.909Zm1.286-2.86c-.24.388-.748.51-1.136.27-2.825-1.737-7.13-2.24-10.47-1.222-.44.133-.904-.115-1.038-.554-.133-.44.115-.904.554-1.038 3.814-1.16 8.553-.6 11.81 1.4.388.24.51.748.27 1.145Zm.11-2.976c-3.387-2.013-8.98-2.2-12.214-1.218-.529.16-1.088-.14-1.248-.668-.16-.529.14-1.088.668-1.248 3.71-1.127 9.86-.91 13.76 1.41.476.283.633.898.35 1.374-.283.476-.898.633-1.374.35Z"
           />
         </svg>
       );
@@ -185,7 +185,6 @@ export default function App() {
           email,
           source: "אתר — Coming soon",
           song: NEXT_RELEASE.songName,
-
           consent: true,
           consentVersion: "v1",
         }),
@@ -193,14 +192,8 @@ export default function App() {
 
       if (!res.ok) throw new Error("bad_response");
 
+      // נשאר פתוח + לא מאפס את הצ’קבוקס כדי שלא תצטרכי לסמן שוב אם עושים ניסויים
       setReminderStatus("success");
-      setReminderEmail("");
-      setConsent(false);
-
-      setTimeout(() => {
-        setEmailOpen(false);
-        setReminderStatus("idle");
-      }, 1100);
     } catch (err) {
       setReminderStatus("error");
     }
@@ -220,11 +213,25 @@ export default function App() {
               Home
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setBioOpen(true);
+                closeMenu();
+              }}
+            >
               Bio
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setContactOpen(true);
+                closeMenu();
+              }}
+            >
               Contact
             </button>
           </nav>
@@ -313,10 +320,11 @@ export default function App() {
                         onChange={(e) => setReminderEmail(e.target.value)}
                         required
                         aria-label="Email"
+                        disabled={reminderStatus === "success"}
                       />
 
-                      <button className="emailBtn" type="submit" disabled={reminderStatus === "sending"}>
-                        {reminderStatus === "sending" ? "Sending…" : "Get reminder"}
+                      <button className="emailBtn" type="submit" disabled={reminderStatus === "sending" || reminderStatus === "success"}>
+                        {reminderStatus === "sending" ? "Sending…" : reminderStatus === "success" ? "Saved" : "Get reminder"}
                       </button>
 
                       <label className="consentRow">
@@ -326,6 +334,7 @@ export default function App() {
                           checked={consent}
                           onChange={(e) => setConsent(e.target.checked)}
                           required
+                          disabled={reminderStatus === "success"}
                         />
                         <span className="consentText">
                           I agree to receive emails from Irena Pasternak, according to the site’s{" "}
@@ -337,8 +346,14 @@ export default function App() {
                       </label>
 
                       {reminderStatus === "success" && (
-                        <div className="emailMsg ok">You’re in. See you on release day.</div>
+                        <div className="emailThanks">
+                          <div className="emailThanksTitle">Thank you</div>
+                          <div className="emailThanksText">
+                            You’ll be among the first to hear the new release.
+                          </div>
+                        </div>
                       )}
+
                       {reminderStatus === "error" && (
                         <div className="emailMsg err">Something went wrong. Please try again.</div>
                       )}
