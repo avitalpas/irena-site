@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles/index.css";
 
 import coverImg from "./assets/cover.png";
@@ -62,7 +62,10 @@ function Icon({ name }) {
     case "menu":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-          <path fill="currentColor" d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z" />
+          <path
+            fill="currentColor"
+            d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z"
+          />
         </svg>
       );
     case "close":
@@ -132,11 +135,20 @@ function Modal({ open, title, onClose, children }) {
   );
 }
 
+function pick(copy, key, fallback) {
+  const v = copy?.[key];
+  return (v && String(v).trim()) ? v : fallback;
+}
+
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bioOpen, setBioOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
+
+  const [lang, setLang] = useState("en"); // EN default for now
+  const [copy, setCopy] = useState({});
+  const [copyStatus, setCopyStatus] = useState("loading"); // loading | ok | error
 
   const [nextSong, setNextSong] = useState(null);
   const [nextSongStatus, setNextSongStatus] = useState("loading"); // loading | ok | error
@@ -152,14 +164,34 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
 
+    async function loadCopy(currentLang) {
+      try {
+        setCopyStatus("loading");
+        const res = await fetch(`/api/site-copy?lang=${encodeURIComponent(currentLang)}`);
+        const data = await res.json();
+        if (!res.ok || !data?.ok) throw new Error("bad_copy");
+        if (!cancelled) {
+          setCopy(data.copy || {});
+          setCopyStatus("ok");
+        }
+      } catch (e) {
+        if (!cancelled) setCopyStatus("error");
+      }
+    }
+
+    loadCopy(lang);
+    return () => { cancelled = true; };
+  }, [lang]);
+
+  useEffect(() => {
+    let cancelled = false;
+
     async function loadNextSong() {
       try {
         setNextSongStatus("loading");
         const res = await fetch("/api/next-song");
         const data = await res.json();
-
-        if (!res.ok || !data?.ok) throw new Error("bad_response");
-
+        if (!res.ok || !data?.ok) throw new Error("bad_song");
         if (!cancelled) {
           setNextSong(data.song || null);
           setNextSongStatus("ok");
@@ -170,9 +202,7 @@ export default function App() {
     }
 
     loadNextSong();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -197,7 +227,7 @@ export default function App() {
     try {
       setReminderStatus("sending");
 
-      const songTitle = nextSong?.title || "Unknown song";
+      const songTitle = nextSong?.title || "";
 
       const res = await fetch("/api/subscribe", {
         method: "POST",
@@ -219,18 +249,38 @@ export default function App() {
     }
   }
 
-  const bannerTitleLine =
-    nextSongStatus === "ok" && nextSong?.title ? "New single is almost here" : "New single is almost here";
+  const t = useMemo(() => {
+    return {
+      comingSoon: pick(copy, "banner.comingSoon", "Coming soon"),
+      reminder: pick(copy, "banner.reminder", "Reminder:"),
+      dontMiss: pick(copy, "email.cta", "Don’t miss release day"),
+      getReminder: pick(copy, "email.button", "Get reminder"),
+      sending: pick(copy, "email.sending", "Sending…"),
+      saved: pick(copy, "email.saved", "Saved"),
+      close: pick(copy, "email.close", "Close"),
+      thanksTitle: pick(copy, "email.thanksTitle", "Thank you"),
+      thanksText: pick(copy, "email.thanksText", "You’ll be among the first to hear the new release."),
+      consentText: pick(
+        copy,
+        "email.consentText",
+        "I agree to receive emails from Irena Pasternak, according to the site’s Privacy Policy."
+      ),
+      legalTitle: pick(copy, "legal.title", "Legal"),
+      lastUpdated: pick(copy, "legal.lastUpdated", "Last updated: 2026-04-06"),
+      privacyTitle: pick(copy, "legal.privacyTitle", "Privacy Policy"),
+      privacyBody: pick(copy, "legal.privacyBody", "…"),
+      termsTitle: pick(copy, "legal.termsTitle", "Terms of Use"),
+      termsBody: pick(copy, "legal.termsBody", "…"),
+      cookiesTitle: pick(copy, "legal.cookiesTitle", "Cookies"),
+      cookiesBody: pick(copy, "legal.cookiesBody", "…"),
+      accTitle: pick(copy, "legal.accessibilityTitle", "Accessibility Statement"),
+      accBody: pick(copy, "legal.accessibilityBody", "…"),
+    };
+  }, [copy]);
 
-  const bannerDate =
-    nextSongStatus === "ok" ? nextSong?.releaseShort || "—" : "…";
-
-  const ytUrl =
-    nextSongStatus === "ok" ? nextSong?.ytUrl || "#" : "#";
-
-  const spUrl =
-    nextSongStatus === "ok" ? nextSong?.spUrl || "#" : "#";
-
+  const bannerDate = nextSongStatus === "ok" ? nextSong?.releaseShort || "—" : "…";
+  const ytUrl = nextSongStatus === "ok" ? nextSong?.ytUrl || "#" : "#";
+  const spUrl = nextSongStatus === "ok" ? nextSong?.spUrl || "#" : "#";
   const disableButtons = nextSongStatus !== "ok";
 
   return (
@@ -244,36 +294,38 @@ export default function App() {
 
           <nav className={`navLinks ${menuOpen ? "open" : ""}`} aria-label="Main">
             <button className="navLinkBtn" type="button" onClick={closeMenu}>
-              Home
+              {pick(copy, "nav.home", "Home")}
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setBioOpen(true);
-                closeMenu();
-              }}
-            >
-              Bio
+            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
+              {pick(copy, "nav.bio", "Bio")}
             </button>
 
-            <button
-              className="navLinkBtn"
-              type="button"
-              onClick={() => {
-                setContactOpen(true);
-                closeMenu();
-              }}
-            >
-              Contact
+            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
+              {pick(copy, "nav.contact", "Contact")}
             </button>
           </nav>
 
           <div className="navRight">
             <div className="lang" aria-label="Language">
-              <span className="active">EN</span>
-              <span className="disabled" title="Coming soon">RU</span>
+              <button
+                type="button"
+                className={`langBtn ${lang === "en" ? "active" : ""}`}
+                onClick={() => setLang("en")}
+                aria-label="English"
+              >
+                EN
+              </button>
+
+              <button
+                type="button"
+                className={`langBtn ${lang === "ru" ? "active" : ""}`}
+                onClick={() => setLang("ru")}
+                aria-label="Russian"
+              >
+                RU
+              </button>
+
               <span className="disabled" title="Coming soon">HE</span>
             </div>
 
@@ -308,13 +360,15 @@ export default function App() {
 
               <div className="comingInfo">
                 <div className="comingTopLine">
-                  <span className="comingTitle">Coming soon</span>
+                  <span className="comingTitle">{t.comingSoon}</span>
                   <span className="comingDate">{bannerDate}</span>
                 </div>
 
-                <div className="comingSub">{bannerTitleLine}</div>
+                <div className="comingSub">
+                  {pick(copy, "banner.subtitle", "New single is almost here")}
+                </div>
 
-                <div className="ctaAbove">Reminder:</div>
+                <div className="ctaAbove">{t.reminder}</div>
 
                 <div className="remindRow" role="group" aria-label="Choose reminder">
                   <a
@@ -360,7 +414,7 @@ export default function App() {
 
                 {emailOpen && (
                   <div className="emailPop" role="group" aria-label="Email reminder form">
-                    <div className="emailCta">Don’t miss release day</div>
+                    <div className="emailCta">{t.dontMiss}</div>
 
                     <form className="emailForm" onSubmit={submitReminder}>
                       <input
@@ -369,7 +423,7 @@ export default function App() {
                         type="email"
                         inputMode="email"
                         autoComplete="email"
-                        placeholder="your@email.com"
+                        placeholder={pick(copy, "email.placeholder", "your@email.com")}
                         value={reminderEmail}
                         onChange={(e) => setReminderEmail(e.target.value)}
                         required
@@ -381,13 +435,12 @@ export default function App() {
                         className="emailBtn"
                         type="submit"
                         disabled={reminderStatus === "sending" || reminderStatus === "success" || nextSongStatus !== "ok"}
-                        title={nextSongStatus !== "ok" ? "Loading song details…" : ""}
                       >
                         {reminderStatus === "sending"
-                          ? "Sending…"
+                          ? t.sending
                           : reminderStatus === "success"
-                          ? "Saved"
-                          : "Get reminder"}
+                          ? t.saved
+                          : t.getReminder}
                       </button>
 
                       <label className="consentRow">
@@ -400,9 +453,13 @@ export default function App() {
                           disabled={reminderStatus === "success"}
                         />
                         <span className="consentText">
-                          I agree to receive emails from Irena Pasternak, according to the site’s{" "}
-                          <button className="consentLinkBtn" type="button" onClick={() => setLegalOpen(true)}>
-                            Privacy Policy
+                          {t.consentText}{" "}
+                          <button
+                            className="consentLinkBtn"
+                            type="button"
+                            onClick={() => setLegalOpen(true)}
+                          >
+                            {pick(copy, "legal.privacyLinkText", "Privacy Policy")}
                           </button>
                           .
                         </span>
@@ -410,15 +467,15 @@ export default function App() {
 
                       {reminderStatus === "success" && (
                         <div className="emailThanks">
-                          <div className="emailThanksTitle">Thank you</div>
-                          <div className="emailThanksText">
-                            You’ll be among the first to hear the new release.
-                          </div>
+                          <div className="emailThanksTitle">{t.thanksTitle}</div>
+                          <div className="emailThanksText">{t.thanksText}</div>
                         </div>
                       )}
 
                       {reminderStatus === "error" && (
-                        <div className="emailMsg err">Something went wrong. Please try again.</div>
+                        <div className="emailMsg err">
+                          {pick(copy, "email.error", "Something went wrong. Please try again.")}
+                        </div>
                       )}
 
                       <button
@@ -430,12 +487,12 @@ export default function App() {
                         }}
                         aria-label="Close email form"
                       >
-                        Close
+                        {t.close}
                       </button>
 
-                      {nextSongStatus === "error" && (
+                      {copyStatus === "error" && (
                         <div className="emailMsg err">
-                          Couldn’t load next song details. Please refresh the page.
+                          {pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}
                         </div>
                       )}
                     </form>
@@ -447,12 +504,12 @@ export default function App() {
 
           <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
             <span className="playCircle"><Icon name="play" /></span>
-            <span>Play on Spotify</span>
+            <span>{pick(copy, "cta.playSpotify", "Play on Spotify")}</span>
           </a>
 
           <div className="legalPills" aria-label="Legal links">
             <button className="legalBtn" type="button" onClick={() => setLegalOpen(true)}>
-              Legal
+              {t.legalTitle}
             </button>
           </div>
 
@@ -462,64 +519,48 @@ export default function App() {
         </section>
       </main>
 
-      <Modal open={bioOpen} title="Bio" onClose={() => setBioOpen(false)}>
-        <p>
-          Irena Pasternak is a Russian pop singer-songwriter and lyricist, crafting cinematic,
-          emotionally-driven songs with warm, intimate storytelling.
-        </p>
-        <p>
-          Selected songs are available for licensing (exclusive or non-exclusive) and are open for
-          recording, performance, and commercial release by other artists.
-        </p>
+      <Modal open={bioOpen} title={pick(copy, "bio.title", "Bio")} onClose={() => setBioOpen(false)}>
+        <p>{pick(copy, "bio.p1", "…")}</p>
+        <p>{pick(copy, "bio.p2", "…")}</p>
       </Modal>
 
-      <Modal open={contactOpen} title="Contact" onClose={() => setContactOpen(false)}>
-        <p className="muted">For collaborations, licensing inquiries, and bookings:</p>
-        <p className="muted">Email: d0503366710@gmail.com</p>
+      <Modal open={contactOpen} title={pick(copy, "contact.title", "Contact")} onClose={() => setContactOpen(false)}>
+        <p className="muted">{pick(copy, "contact.p1", "For collaborations, licensing inquiries, and bookings:")}</p>
+        <p className="muted">{pick(copy, "contact.emailLine", "Email: d0503366710@gmail.com")}</p>
         <p>
-          Instagram:{" "}
+          {pick(copy, "contact.instagramLabel", "Instagram:")}{" "}
           <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">
             @irena_pasternak
           </a>
         </p>
         <p>
-          YouTube:{" "}
+          {pick(copy, "contact.youtubeLabel", "YouTube:")}{" "}
           <a className="inlineLink" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer">
-            Channel
+            {pick(copy, "contact.youtubeLinkText", "Channel")}
           </a>
         </p>
       </Modal>
 
-      <Modal open={legalOpen} title="Legal" onClose={() => setLegalOpen(false)}>
-        <p className="muted">Last updated: 2026-04-06</p>
+      <Modal open={legalOpen} title={t.legalTitle} onClose={() => setLegalOpen(false)}>
+        <p className="muted">{t.lastUpdated}</p>
 
-        <h3 className="legalHeading">Privacy Policy</h3>
-        <p>
-          This website is a promotional site for Irena Pasternak. We do not intentionally collect
-          sensitive personal data.
-        </p>
-        <p>
-          If you submit your email for a reminder, we store your email address to send release
-          updates and reminders.
-        </p>
+        <h3 className="legalHeading">{t.privacyTitle}</h3>
+        <p>{t.privacyBody}</p>
 
         <hr className="legalDivider" />
 
-        <h3 className="legalHeading">Terms of Use</h3>
-        <p>
-          All content on this website is protected by copyright and belongs to Irena Pasternak or is
-          used with permission.
-        </p>
+        <h3 className="legalHeading">{t.termsTitle}</h3>
+        <p>{t.termsBody}</p>
 
         <hr className="legalDivider" />
 
-        <h3 className="legalHeading">Cookies</h3>
-        <p>The site may use cookies in the future if analytics or marketing tools are enabled.</p>
+        <h3 className="legalHeading">{t.cookiesTitle}</h3>
+        <p>{t.cookiesBody}</p>
 
         <hr className="legalDivider" />
 
-        <h3 className="legalHeading">Accessibility Statement</h3>
-        <p>If you experience accessibility issues, please contact us by email.</p>
+        <h3 className="legalHeading">{t.accTitle}</h3>
+        <p>{t.accBody}</p>
       </Modal>
     </div>
   );
