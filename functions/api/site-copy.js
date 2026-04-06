@@ -11,18 +11,15 @@ function requireEnv(env, key) {
   return val;
 }
 
-function getTextProp(props, name) {
+function richTextToPlain(arr) {
+  return (arr || []).map((r) => r.plain_text || "").join("");
+}
+
+function getPropText(props, name) {
   const p = props?.[name];
   if (!p) return "";
-  // "text" property in Notion API returns rich_text array
-  if (p.type === "rich_text") {
-    return (p.rich_text || []).map((r) => r.plain_text || "").join("");
-  }
-  // sometimes title is used
-  if (p.type === "title") {
-    return (p.title || []).map((r) => r.plain_text || "").join("");
-  }
-  // fallback
+  if (p.type === "title") return richTextToPlain(p.title);
+  if (p.type === "rich_text") return richTextToPlain(p.rich_text);
   return "";
 }
 
@@ -35,28 +32,26 @@ export async function onRequestGet(context) {
 
     const url = new URL(request.url);
     const lang = (url.searchParams.get("lang") || "en").toLowerCase();
-    const langCol = lang === "ru" ? "RU" : "EN";
+    const wantRU = lang === "ru";
 
-    // query all rows
-    const res = await fetch(
-      `https://api.notion.com/v1/databases/${NOTION_SITE_COPY_DB_ID}/query`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${NOTION_TOKEN}`,
-          "Notion-Version": "2022-06-28",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          page_size: 100,
-          sorts: [{ property: "key", direction: "ascending" }],
-        }),
-      }
-    );
+    const notionUrl = `https://api.notion.com/v1/databases/${NOTION_SITE_COPY_DB_ID}/query`;
+
+    const res = await fetch(notionUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${NOTION_TOKEN}`,
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        page_size: 100,
+        sorts: [{ property: "key", direction: "ascending" }],
+      }),
+    });
 
     if (!res.ok) {
-      const t = await res.text().catch(() => "");
-      return jsonResponse(500, { ok: false, error: "Notion query failed", details: t });
+      const details = await res.text().catch(() => "");
+      return jsonResponse(500, { ok: false, error: "Notion query failed", details });
     }
 
     const data = await res.json();
@@ -65,18 +60,17 @@ export async function onRequestGet(context) {
     const dict = {};
     for (const row of results) {
       const props = row.properties || {};
-      const k = getTextProp(props, "key").trim();
+      const k = getPropText(props, "key").trim();
       if (!k) continue;
 
-      const en = getTextProp(props, "EN").trim();
-      const ru = getTextProp(props, "RU").trim();
+      const en = getPropText(props, "EN").trim();
+      const ru = getPropText(props, "RU").trim();
 
-      // fallback: if requested language missing, fallback to EN
-      const val = (langCol === "RU" ? ru : en) || en || ru || "";
+      const val = (wantRU ? ru : en) || en || ru || "";
       dict[k] = val;
     }
 
-    return jsonResponse(200, { ok: true, lang: langCol.toLowerCase(), copy: dict });
+    return jsonResponse(200, { ok: true, lang: wantRU ? "ru" : "en", copy: dict });
   } catch (e) {
     return jsonResponse(500, { ok: false, error: e?.message || "Server error" });
   }
