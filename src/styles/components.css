@@ -54,14 +54,14 @@
   }
 }
 
-/* Mobile: socials become a bottom row, with bigger spacing from Play */
+/* Mobile: socials become a bottom row */
 @media (max-width: 720px) {
   .socialRail {
     left: 50%;
     top: auto;
 
-    /* more distance from Play */
-    bottom: calc(max(14px, env(safe-area-inset-bottom)) + 92px);
+    /* keep above fixed Play button */
+    bottom: calc(14px + env(safe-area-inset-bottom) + 86px);
 
     transform: translateX(-50%);
     flex-direction: row;
@@ -76,7 +76,7 @@
 
 @media (max-width: 520px) {
   .socialRail {
-    bottom: calc(max(14px, env(safe-area-inset-bottom)) + 96px);
+    bottom: calc(14px + env(safe-area-inset-bottom) + 86px);
     gap: 10px;
   }
 
@@ -121,16 +121,52 @@
   }
 }
 
-/* Mobile: bottom-right */
+/* Mobile: bottom-right (above safe area) */
 @media (max-width: 720px) {
   .legalPills {
     left: auto;
     right: 12px;
-    bottom: max(12px, env(safe-area-inset-bottom));
+    bottom: calc(12px + env(safe-area-inset-bottom));
   }
 }
 
-/* Modal */
+/* Copyright line OUTSIDE the modal (FIX: not cut + not under Legal) */
+.copyrightLine {
+  position: fixed;
+
+  /* leave air from edges so it never clips */
+  left: 18px;
+
+  /* push ABOVE Legal button area so it won't overlap or get cut */
+  bottom: calc(56px + env(safe-area-inset-bottom));
+
+  z-index: 20;
+
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  color: rgba(245, 237, 224, 0.72);
+  text-shadow: 0 12px 34px rgba(0,0,0,0.55);
+
+  /* prevent being too wide on small screens */
+  max-width: calc(100vw - 36px);
+  white-space: normal;
+
+  pointer-events: none;
+}
+
+/* Desktop: place it near bottom-left, still above Legal */
+@media (min-width: 721px) {
+  .copyrightLine {
+    left: 22px;
+    bottom: 56px;
+    font-size: 10px;
+  }
+}
+
+/* Modal overlay */
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -138,9 +174,13 @@
   backdrop-filter: blur(14px);
   display: grid;
   place-items: center;
+
   padding: 18px;
+
   z-index: 60;
   animation: overlayIn 260ms var(--easeOut) both;
+
+  overflow: auto;
 }
 
 @keyframes overlayIn {
@@ -148,14 +188,22 @@
   to { opacity: 1; }
 }
 
+/* Modal card: big/wide + internal scroll */
 .modalCard {
-  width: min(760px, 100%);
+  width: min(960px, 100%);
+  max-height: calc(100dvh - 36px);
   border-radius: 22px;
+
   background: rgba(245, 237, 224, 0.12);
   border: 1px solid rgba(245, 237, 224, 0.18);
   box-shadow: 0 34px 110px rgba(0,0,0,0.60);
+
   overflow: hidden;
+
   animation: modalIn 560ms var(--easeOut) both;
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 @keyframes modalIn {
@@ -179,10 +227,14 @@
   color: rgba(245, 237, 224, 0.92);
 }
 
+/* scrolling area */
 .modalBody {
   padding: 18px 14px 18px;
   color: rgba(245, 237, 224, 0.92);
   line-height: 1.8;
+
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .inlineLink {

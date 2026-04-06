@@ -10,17 +10,15 @@ const LINKS = {
   tiktok: "https://www.tiktok.com/@irena.pasternak?lang=en",
   facebook: "https://www.facebook.com/irena.pasternak.music/",
   youtubeChannel: "https://www.youtube.com/channel/UCFz5Nn6mBDch3T7QIwUqpSA",
-  email: "d0503366710@gmail.com",
-
-  nextYoutubeReminder: "https://youtu.be/yy-UaK7_rhI",
-  nextSpotifyReminder: "https://distrokid.com/hyperfollow/97a8286/--",
 };
 
 const NEXT_RELEASE = {
   dateLabel: "14.03",
   titleLine: "New single is almost here",
-  emotionalLine:
-    "A warm, cinematic love story — the kind that stays with you after the last note.",
+  emotionalLine: "A warm, cinematic love story — the kind that stays with you after the last note.",
+  youtubeReminder: "https://youtu.be/yy-UaK7_rhI",
+  spotifyPresave: "https://distrokid.com/hyperfollow/97a8286/--",
+  songName: "Мажор моей души",
 };
 
 function Icon({ name }) {
@@ -73,10 +71,7 @@ function Icon({ name }) {
     case "menu":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-          <path
-            fill="currentColor"
-            d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z"
-          />
+          <path fill="currentColor" d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z" />
         </svg>
       );
     case "close":
@@ -152,18 +147,67 @@ export default function App() {
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
 
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [reminderEmail, setReminderEmail] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [reminderStatus, setReminderStatus] = useState("idle"); // idle | sending | success | error
+  const reminderInputRef = useRef(null);
+
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    if (!emailOpen) return;
+    const t = setTimeout(() => {
+      if (reminderInputRef.current) reminderInputRef.current.focus();
+    }, 60);
+    return () => clearTimeout(t);
+  }, [emailOpen]);
+
+  async function submitReminder(e) {
+    e.preventDefault();
+
+    const email = reminderEmail.trim();
+    if (!email) return;
+
+    if (!consent) {
+      setReminderStatus("error");
+      return;
+    }
+
+    try {
+      setReminderStatus("sending");
+
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          source: "אתר — Coming soon",
+          song: NEXT_RELEASE.songName,
+          notes: "Consent: yes",
+        }),
+      });
+
+      if (!res.ok) throw new Error("bad_response");
+
+      setReminderStatus("success");
+      setReminderEmail("");
+      setConsent(false);
+
+      setTimeout(() => {
+        setEmailOpen(false);
+        setReminderStatus("idle");
+      }, 1100);
+    } catch (err) {
+      setReminderStatus("error");
+    }
+  }
 
   return (
     <div className={`page ${menuOpen ? "menuOpen" : ""}`}>
       <header className={`nav ${menuOpen ? "menuIsOpen" : ""}`}>
         <div className="navInner">
-          <a
-            className="brand brandWithLogo"
-            href="#top"
-            onClick={closeMenu}
-            aria-label="Home"
-          >
+          <a className="brand brandWithLogo" href="#top" onClick={closeMenu} aria-label="Home">
             <img className="navLogo" src={logoImg} alt="" />
             <span className="brandScript">Irena Pasternak</span>
           </a>
@@ -221,49 +265,19 @@ export default function App() {
       </header>
 
       <aside className="socialRail" aria-label="Social links">
-        <a
-          className="socialIcon"
-          href={LINKS.spotifyArtist}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Spotify"
-        >
+        <a className="socialIcon" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Spotify">
           <Icon name="spotify" />
         </a>
-        <a
-          className="socialIcon"
-          href={LINKS.youtubeChannel}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="YouTube"
-        >
+        <a className="socialIcon" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer" aria-label="YouTube">
           <Icon name="youtube" />
         </a>
-        <a
-          className="socialIcon"
-          href={LINKS.tiktok}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="TikTok"
-        >
+        <a className="socialIcon" href={LINKS.tiktok} target="_blank" rel="noreferrer" aria-label="TikTok">
           <Icon name="tiktok" />
         </a>
-        <a
-          className="socialIcon"
-          href={LINKS.instagram}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Instagram"
-        >
+        <a className="socialIcon" href={LINKS.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
           <Icon name="instagram" />
         </a>
-        <a
-          className="socialIcon"
-          href={LINKS.facebook}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Facebook"
-        >
+        <a className="socialIcon" href={LINKS.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
           <Icon name="facebook" />
         </a>
       </aside>
@@ -287,57 +301,98 @@ export default function App() {
                 <div className="ctaAbove">Reminder:</div>
 
                 <div className="remindRow" role="group" aria-label="Choose reminder">
-                  <a
-                    className="remindBtn yt"
-                    href={LINKS.nextYoutubeReminder}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="YouTube reminder"
-                  >
+                  <a className="remindBtn yt" href={NEXT_RELEASE.youtubeReminder} target="_blank" rel="noreferrer" aria-label="YouTube reminder">
                     <span className="remindIcon">
                       <Icon name="youtube" />
                     </span>
                   </a>
 
-                  <a
-                    className="remindBtn sp"
-                    href={LINKS.nextSpotifyReminder}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Spotify pre-save"
-                  >
+                  <a className="remindBtn sp" href={NEXT_RELEASE.spotifyPresave} target="_blank" rel="noreferrer" aria-label="Spotify pre-save">
                     <span className="remindIcon">
                       <Icon name="spotify" />
                     </span>
                   </a>
 
-                  <a
+                  <button
                     className="remindBtn em"
-                    href={`mailto:${LINKS.email}?subject=Reminder%20-%20New%20single%20(${encodeURIComponent(
-                      NEXT_RELEASE.dateLabel
-                    )})&body=Hi!%0A%0APlease%20send%20me%20a%20reminder%20when%20the%20new%20single%20drops.%0A%0AYouTube%20reminder:%20${encodeURIComponent(
-                      LINKS.nextYoutubeReminder
-                    )}%0ASpotify%20pre-save:%20${encodeURIComponent(
-                      LINKS.nextSpotifyReminder
-                    )}%0A`}
+                    type="button"
                     aria-label="Email reminder"
+                    onClick={() => {
+                      setEmailOpen((v) => !v);
+                      setReminderStatus("idle");
+                    }}
                   >
                     <span className="remindIcon">
                       <Icon name="mail" />
                     </span>
-                  </a>
+                  </button>
                 </div>
+
+                {emailOpen && (
+                  <div className="emailPop" role="group" aria-label="Email reminder form">
+                    <div className="emailCta">Don’t miss release day</div>
+
+                    <form className="emailForm" onSubmit={submitReminder}>
+                      <input
+                        ref={reminderInputRef}
+                        className="emailInput"
+                        type="email"
+                        inputMode="email"
+                        autoComplete="email"
+                        placeholder="your@email.com"
+                        value={reminderEmail}
+                        onChange={(e) => setReminderEmail(e.target.value)}
+                        required
+                        aria-label="Email"
+                      />
+
+                      <button className="emailBtn" type="submit" disabled={reminderStatus === "sending"}>
+                        {reminderStatus === "sending" ? "Sending…" : "Get reminder"}
+                      </button>
+
+                      <label className="consentRow">
+                        <input
+                          className="consentBox"
+                          type="checkbox"
+                          checked={consent}
+                          onChange={(e) => setConsent(e.target.checked)}
+                          required
+                        />
+                        <span className="consentText">
+                          I agree to receive emails from Irena Pasternak, according to the site’s{" "}
+                          <button
+                            className="consentLinkBtn"
+                            type="button"
+                            onClick={() => setLegalOpen(true)}
+                          >
+                            Privacy Policy
+                          </button>
+                          .
+                        </span>
+                      </label>
+
+                      {reminderStatus === "success" && <div className="emailMsg ok">You’re in. See you on release day.</div>}
+                      {reminderStatus === "error" && <div className="emailMsg err">Please check the box and try again.</div>}
+
+                      <button
+                        className="emailClose"
+                        type="button"
+                        onClick={() => {
+                          setEmailOpen(false);
+                          setReminderStatus("idle");
+                        }}
+                        aria-label="Close email form"
+                      >
+                        Close
+                      </button>
+                    </form>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
-          <a
-            className="playPill playPillSmall"
-            href={LINKS.spotifyArtist}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Open Spotify artist page"
-          >
+          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
             <span className="playCircle">
               <Icon name="play" />
             </span>
@@ -369,12 +424,7 @@ export default function App() {
 
       <Modal open={contactOpen} title="Contact" onClose={() => setContactOpen(false)}>
         <p className="muted">For collaborations, licensing inquiries, and bookings:</p>
-        <p>
-          Email:{" "}
-          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
-            {LINKS.email}
-          </a>
-        </p>
+        <p className="muted">Email: d0503366710@gmail.com</p>
         <p>
           Instagram:{" "}
           <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">
@@ -394,55 +444,31 @@ export default function App() {
 
         <h3 className="legalHeading">Privacy Policy</h3>
         <p>
-          This website is a promotional site for Irena Pasternak. We do not intentionally collect
-          sensitive personal data.
+          This website is a promotional site for Irena Pasternak. We do not intentionally collect sensitive personal data.
         </p>
         <p>
-          If you contact us by email, we will receive your email address and the information you
-          include in your message. We use it only to respond and for collaboration/licensing
-          inquiries.
-        </p>
-        <p>
-          Analytics and cookies: If analytics tools are enabled in the future, the site may use
-          cookies or similar technologies to measure performance and improve the experience. This
-          policy will be updated accordingly.
+          If you submit your email for a reminder, we store your email address to send release updates and reminders.
         </p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Terms of Use</h3>
         <p>
-          All content on this website (including music, lyrics, images, and branding) is protected
-          by copyright and other intellectual property laws and belongs to Irena Pasternak or is
-          used with permission.
-        </p>
-        <p>
-          You may view and share this website for personal, non-commercial use. Any commercial use,
-          copying, distribution, or reuse of content requires prior written permission.
-        </p>
-        <p>
-          This website is provided “as is” without warranties. We are not responsible for external
-          sites linked from this website.
+          All content on this website is protected by copyright and belongs to Irena Pasternak or is used with permission.
         </p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Cookies</h3>
         <p>
-          The site may use cookies in the future if analytics or marketing tools are enabled. If
-          that happens, we will update this section and, if required, show a cookie notice.
+          The site may use cookies in the future if analytics or marketing tools are enabled.
         </p>
 
         <hr className="legalDivider" />
 
         <h3 className="legalHeading">Accessibility Statement</h3>
         <p>
-          We aim to make this website accessible and usable. If you experience any accessibility
-          issues, please contact{" "}
-          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
-            {LINKS.email}
-          </a>{" "}
-          and describe the issue (device, browser, and a screenshot if possible).
+          If you experience accessibility issues, please contact us by email.
         </p>
       </Modal>
     </div>
