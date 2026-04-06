@@ -137,6 +137,12 @@ function pick(copy, key, fallback) {
   return v && String(v).trim() ? v : fallback;
 }
 
+function normalizeLang(x) {
+  const v = String(x || "").toLowerCase();
+  if (v === "he" || v === "ru" || v === "en") return v;
+  return null;
+}
+
 export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [bioOpen, setBioOpen] = useState(false);
@@ -159,10 +165,38 @@ export default function App() {
 
   const closeMenu = () => setMenuOpen(false);
 
-  function setLangFromMenu(nextLang) {
-    setLang(nextLang);
-    closeMenu();
+  function setLangEverywhere(nextLang, { close = false, source = "ui" } = {}) {
+    const normalized = normalizeLang(nextLang) || "ru";
+    setLang(normalized);
+
+    // מעדכן URL כדי שאפשר יהיה להעתיק/לשתף
+    // אם הגיע מלינק חיצוני - נשמר; אם הגיע מכפתור - נעדכן
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", normalized);
+      window.history.replaceState({}, "", url);
+    }
+
+    if (close) closeMenu();
   }
+
+  // 1) טעינה ראשונה: אם יש ?lang=... ב-URL, זה מנצח ברירת מחדל
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      const qLang = normalizeLang(url.searchParams.get("lang"));
+      if (qLang) {
+        setLang(qLang);
+      } else {
+        // אם אין, נכתוב ברירת מחדל ל-URL כדי שאפשר יהיה להעתיק מיד
+        url.searchParams.set("lang", "ru");
+        window.history.replaceState({}, "", url);
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute("dir", dir);
@@ -327,7 +361,6 @@ export default function App() {
               {pick(copy, "nav.contact", "Contact")}
             </button>
 
-            {/* שפות + משפטי יוצגו רק כשההמבורגר פתוח */}
             {menuOpen && (
               <>
                 <div className="navDivider" />
@@ -337,21 +370,21 @@ export default function App() {
                   <button
                     type="button"
                     className={`langBtn ${lang === "ru" ? "active" : ""}`}
-                    onClick={() => setLangFromMenu("ru")}
+                    onClick={() => setLangEverywhere("ru", { close: true })}
                   >
                     🇷🇺 RU
                   </button>
                   <button
                     type="button"
                     className={`langBtn ${lang === "en" ? "active" : ""}`}
-                    onClick={() => setLangFromMenu("en")}
+                    onClick={() => setLangEverywhere("en", { close: true })}
                   >
                     🇺🇸 EN
                   </button>
                   <button
                     type="button"
                     className={`langBtn ${lang === "he" ? "active" : ""}`}
-                    onClick={() => setLangFromMenu("he")}
+                    onClick={() => setLangEverywhere("he", { close: true })}
                   >
                     🇮🇱 HE
                   </button>
@@ -375,13 +408,25 @@ export default function App() {
 
           <div className="navRight">
             <div className="lang langTop" aria-label="Language">
-              <button type="button" className={`langBtn ${lang === "ru" ? "active" : ""}`} onClick={() => setLang("ru")}>
+              <button
+                type="button"
+                className={`langBtn ${lang === "ru" ? "active" : ""}`}
+                onClick={() => setLangEverywhere("ru")}
+              >
                 🇷🇺 RU
               </button>
-              <button type="button" className={`langBtn ${lang === "en" ? "active" : ""}`} onClick={() => setLang("en")}>
+              <button
+                type="button"
+                className={`langBtn ${lang === "en" ? "active" : ""}`}
+                onClick={() => setLangEverywhere("en")}
+              >
                 🇺🇸 EN
               </button>
-              <button type="button" className={`langBtn ${lang === "he" ? "active" : ""}`} onClick={() => setLang("he")}>
+              <button
+                type="button"
+                className={`langBtn ${lang === "he" ? "active" : ""}`}
+                onClick={() => setLangEverywhere("he")}
+              >
                 🇮🇱 HE
               </button>
             </div>
