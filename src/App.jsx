@@ -73,7 +73,10 @@ function Icon({ name }) {
     case "menu":
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true" className="icon">
-          <path fill="currentColor" d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z" />
+          <path
+            fill="currentColor"
+            d="M4 6.5h16v2H4v-2Zm0 4.5h16v2H4v-2Zm0 4.5h16v2H4v-2Z"
+          />
         </svg>
       );
     case "close":
@@ -152,8 +155,8 @@ export default function App() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <div className="page">
-      <header className="nav">
+    <div className={`page ${menuOpen ? "menuOpen" : ""}`}>
+      <header className={`nav ${menuOpen ? "menuIsOpen" : ""}`}>
         <div className="navInner">
           <a className="brand brandWithLogo" href="#top" onClick={closeMenu} aria-label="Home">
             <img className="navLogo" src={logoImg} alt="" />
@@ -165,11 +168,25 @@ export default function App() {
               Home
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setBioOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setBioOpen(true);
+                closeMenu();
+              }}
+            >
               Bio
             </button>
 
-            <button className="navLinkBtn" type="button" onClick={() => { setContactOpen(true); closeMenu(); }}>
+            <button
+              className="navLinkBtn"
+              type="button"
+              onClick={() => {
+                setContactOpen(true);
+                closeMenu();
+              }}
+            >
               Contact
             </button>
           </nav>
@@ -177,8 +194,12 @@ export default function App() {
           <div className="navRight">
             <div className="lang" aria-label="Language">
               <span className="active">EN</span>
-              <span className="disabled" title="Coming soon">RU</span>
-              <span className="disabled" title="Coming soon">HE</span>
+              <span className="disabled" title="Coming soon">
+                RU
+              </span>
+              <span className="disabled" title="Coming soon">
+                HE
+              </span>
             </div>
 
             <button
@@ -231,24 +252,58 @@ export default function App() {
                 <div className="ctaAbove">Reminder:</div>
 
                 <div className="remindRow" role="group" aria-label="Choose reminder">
-                  <a className="remindBtn yt" href={LINKS.nextYoutubeReminder} target="_blank" rel="noreferrer" aria-label="YouTube">
-                    <span className="remindIcon"><Icon name="youtube" /></span>
+                  <a
+                    className="remindBtn yt"
+                    href={LINKS.nextYoutubeReminder}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="YouTube reminder"
+                  >
+                    <span className="remindIcon">
+                      <Icon name="youtube" />
+                    </span>
                   </a>
 
-                  <a className="remindBtn sp" href={LINKS.nextSpotifyReminder} target="_blank" rel="noreferrer" aria-label="Spotify">
-                    <span className="remindIcon"><Icon name="spotify" /></span>
+                  <a
+                    className="remindBtn sp"
+                    href={LINKS.nextSpotifyReminder}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="Spotify pre-save"
+                  >
+                    <span className="remindIcon">
+                      <Icon name="spotify" />
+                    </span>
                   </a>
 
-                  <a className="remindBtn em" href={`mailto:${LINKS.email}?subject=Irena%20Pasternak%20%E2%80%94%20Coming%20Soon%20Reminder`} aria-label="Email">
-                    <span className="remindIcon"><Icon name="mail" /></span>
+                  <a
+                    className="remindBtn em"
+                    href={`mailto:${LINKS.email}?subject=Reminder%20-%20New%20single%20(${encodeURIComponent(
+                      NEXT_RELEASE.dateLabel
+                    )})&body=Hi!%0A%0APlease%20send%20me%20a%20reminder%20when%20the%20new%20single%20drops.%0A%0AYouTube%20reminder:%20${encodeURIComponent(
+                      LINKS.nextYoutubeReminder
+                    )}%0ASpotify%20pre-save:%20${encodeURIComponent(LINKS.nextSpotifyReminder)}%0A`}
+                    aria-label="Email reminder"
+                  >
+                    <span className="remindIcon">
+                      <Icon name="mail" />
+                    </span>
                   </a>
                 </div>
               </div>
             </div>
           </div>
 
-          <a className="playPill playPillSmall" href={LINKS.spotifyArtist} target="_blank" rel="noreferrer" aria-label="Open Spotify artist page">
-            <span className="playCircle"><Icon name="play" /></span>
+          <a
+            className="playPill playPillSmall"
+            href={LINKS.spotifyArtist}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open Spotify artist page"
+          >
+            <span className="playCircle">
+              <Icon name="play" />
+            </span>
             <span>Play on Spotify</span>
           </a>
 
@@ -274,13 +329,22 @@ export default function App() {
       <Modal open={contactOpen} title="Contact" onClose={() => setContactOpen(false)}>
         <p className="muted">For collaborations, licensing inquiries, and bookings:</p>
         <p>
-          Email: <a className="inlineLink" href={`mailto:${LINKS.email}`}>{LINKS.email}</a>
+          Email:{" "}
+          <a className="inlineLink" href={`mailto:${LINKS.email}`}>
+            {LINKS.email}
+          </a>
         </p>
         <p>
-          Instagram: <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">@irena_pasternak</a>
+          Instagram:{" "}
+          <a className="inlineLink" href={LINKS.instagram} target="_blank" rel="noreferrer">
+            @irena_pasternak
+          </a>
         </p>
         <p>
-          YouTube: <a className="inlineLink" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer">Channel</a>
+          YouTube:{" "}
+          <a className="inlineLink" href={LINKS.youtubeChannel} target="_blank" rel="noreferrer">
+            Channel
+          </a>
         </p>
       </Modal>
 

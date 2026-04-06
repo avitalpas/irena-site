@@ -15,7 +15,6 @@
   .heroFull { background-position: 52% 45%; }
 }
 
-/* Mobile: adjust framing */
 @media (max-width: 520px) {
   .heroFull { background-position: 62% 32%; }
 }
@@ -38,6 +37,18 @@
   padding: 10px 10px;
 
   animation: cardIn 520ms var(--easeOut) both;
+
+  /* חזרה ל"אנימציות עדינות" גם בזמן שינוי מצב/פתיחת תפריט */
+  transition:
+    top 420ms var(--easeOut),
+    transform 420ms var(--easeOut),
+    width 420ms var(--easeOut),
+    opacity 240ms var(--easeOut);
+}
+
+/* כשהתפריט נפתח: מורידים את הבאנר מספיק כדי שלא תהיה חפיפה */
+.menuOpen .comingCard {
+  top: calc(92px + 156px);
 }
 
 @keyframes cardIn {
@@ -69,9 +80,7 @@
   display: block;
 }
 
-.comingInfo {
-  min-width: 0;
-}
+.comingInfo { min-width: 0; }
 
 .comingTopLine {
   display: flex;
@@ -134,13 +143,18 @@
   background: rgba(13, 9, 6, 0.18);
   border: 1px solid rgba(13, 9, 6, 0.16);
 
-  transition: transform 220ms var(--easeOut), box-shadow 220ms var(--easeOut), border-color 220ms var(--easeOut);
+  transition:
+    transform 220ms var(--easeOut),
+    box-shadow 220ms var(--easeOut),
+    border-color 220ms var(--easeOut),
+    background 220ms var(--easeOut);
 }
 
 .remindBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 40px rgba(0,0,0,0.22);
   border-color: rgba(13, 9, 6, 0.24);
+  background: rgba(13, 9, 6, 0.22);
 }
 
 .remindIcon .icon {
@@ -152,13 +166,6 @@
 .remindBtn.yt { border-color: rgba(255, 0, 0, 0.55); }
 .remindBtn.sp { border-color: rgba(30, 215, 96, 0.55); }
 .remindBtn.em { border-color: rgba(100, 170, 255, 0.55); }
-
-/* Very small phones */
-@media (max-width: 380px) {
-  .comingCompact { grid-template-columns: 76px 1fr; }
-  .comingCover { width: 76px; height: 76px; }
-  .comingSub { -webkit-line-clamp: 1; }
-}
 
 /* Desktop / large screens: bigger CARD + bigger text + bigger buttons */
 @media (min-width: 1100px) {
@@ -179,48 +186,22 @@
     border-radius: 18px;
   }
 
-  .comingTitle {
-    font-size: 13px;
-    letter-spacing: 0.18em;
-  }
-
-  .comingDate {
-    font-size: 15px;
-  }
-
-  .comingSub {
-    margin-top: 6px;
-    font-size: 18px;
-    -webkit-line-clamp: 2;
-  }
-
-  .ctaAbove {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-size: 11px;
-  }
-
-  .remindRow {
-    gap: 12px;
-  }
-
-  .remindBtn {
-    height: 46px;
-    border-radius: 14px;
-  }
-
-  .remindIcon .icon {
-    width: 20px;
-    height: 20px;
-  }
+  .comingTitle { font-size: 13px; letter-spacing: 0.18em; }
+  .comingDate { font-size: 15px; }
+  .comingSub { margin-top: 6px; font-size: 18px; -webkit-line-clamp: 2; }
+  .ctaAbove { margin-top: 10px; margin-bottom: 10px; font-size: 11px; }
+  .remindRow { gap: 12px; }
+  .remindBtn { height: 46px; border-radius: 14px; }
+  .remindIcon .icon { width: 20px; height: 20px; }
 }
 
-/* Play button */
+/* PLAY button: fixed so it doesn't get cut in mobile browsers */
 .playPill {
-  position: absolute;
+  position: fixed;
   left: 50%;
-  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 18px);
   transform: translateX(-50%);
+  z-index: 45;
+  bottom: calc(14px + env(safe-area-inset-bottom));
 
   display: inline-flex;
   align-items: center;
@@ -240,7 +221,10 @@
   text-transform: uppercase;
   font-size: 11px;
 
-  transition: transform 240ms var(--easeOut), box-shadow 240ms var(--easeOut), filter 240ms var(--easeOut);
+  transition:
+    transform 240ms var(--easeOut),
+    box-shadow 240ms var(--easeOut),
+    filter 240ms var(--easeOut);
 }
 
 .playPill:hover {

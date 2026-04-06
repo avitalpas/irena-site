@@ -7,10 +7,24 @@
 
   background: linear-gradient(
     to bottom,
-    rgba(13, 9, 6, 0.72) 0%,
-    rgba(13, 9, 6, 0.38) 45%,
+    rgba(13, 9, 6, 0.58) 0%,
+    rgba(13, 9, 6, 0.26) 55%,
     rgba(13, 9, 6, 0.0) 100%
   );
+
+  backdrop-filter: blur(10px);
+  transition: background 320ms var(--easeOut), backdrop-filter 320ms var(--easeOut);
+}
+
+/* כשפתוח תפריט: רקע מעט חזק יותר כדי שלא ייראה "שקוף ובאגי" */
+.nav.menuIsOpen {
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 9, 6, 0.82) 0%,
+    rgba(13, 9, 6, 0.54) 64%,
+    rgba(13, 9, 6, 0.10) 100%
+  );
+  backdrop-filter: blur(14px);
 }
 
 .navInner {
@@ -76,7 +90,10 @@
   padding: 8px 12px;
   border-radius: 999px;
   cursor: pointer;
-  transition: transform 200ms var(--easeOut), background 200ms var(--easeOut), opacity 200ms var(--easeOut);
+  transition:
+    transform 220ms var(--easeOut),
+    background 220ms var(--easeOut),
+    opacity 220ms var(--easeOut);
   text-shadow: 0 12px 34px rgba(0,0,0,0.55);
 }
 
@@ -120,7 +137,10 @@
   border: 1px solid rgba(255, 255, 255, 0.14);
   color: rgba(255, 255, 255, 0.92);
   cursor: pointer;
-  transition: transform 220ms var(--easeOut), background 220ms var(--easeOut), border-color 220ms var(--easeOut);
+  transition:
+    transform 220ms var(--easeOut),
+    background 220ms var(--easeOut),
+    border-color 220ms var(--easeOut);
   text-shadow: none;
 }
 
@@ -152,36 +172,56 @@
   .navRight { grid-area: right; }
   .navLinks { grid-area: links; justify-self: start; }
 
-  /* FIX: don't hide language on mobile */
-  .lang { display: flex; }
-
+  .lang { display: flex; gap: 10px; font-size: 11px; }
   .burger { display: grid; }
 
+  /* תפריט נפתח בעדינות (לא קופץ), וגם עם מעט רקע כדי שלא יתערבב עם הבאנר */
   .navLinks {
-    display: none;
     width: 100%;
-    padding-top: 8px;
-    padding-bottom: 6px;
+    display: grid;
+    gap: 10px;
+
+    margin-top: 10px;
+
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform: translateY(-8px);
+
+    transition:
+      max-height 420ms var(--easeOut),
+      opacity 260ms var(--easeOut),
+      transform 420ms var(--easeOut);
   }
 
   .navLinks.open {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    max-height: 260px;
+    opacity: 1;
+    transform: translateY(0);
   }
 
+  /* הכפתורים עצמם: רקע פחות שקוף + blur + גבול ברור */
   .navLinkBtn,
   .navLinks a {
     width: 100%;
     text-align: left;
-    background: rgba(13, 9, 6, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    background: rgba(13, 9, 6, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(12px);
+
+    transition:
+      background 240ms var(--easeOut),
+      transform 240ms var(--easeOut),
+      border-color 240ms var(--easeOut);
+  }
+
+  .navLinkBtn:hover,
+  .navLinks a:hover {
+    background: rgba(13, 9, 6, 0.62);
+    border-color: rgba(255, 255, 255, 0.22);
   }
 
   .brandScript { font-size: 26px; }
   .navLogo { width: 24px; height: 24px; }
-
-  /* make languages more compact so they fit */
-  .lang { gap: 10px; font-size: 11px; }
 }
