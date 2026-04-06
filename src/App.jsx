@@ -1,121 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="page">
+      <header className="nav">
+        <div className="brand">Irena Pasternak</div>
+        <div className="lang">
+          <span className="active">EN</span>
+          <span className="disabled" title="Coming soon">RU</span>
+          <span className="disabled" title="Coming soon">HE</span>
         </div>
-        <div>
-          <h1>Get started</h1>
+      </header>
+
+      <main>
+        <section className="hero">
+          <div className="heroInner">
+            <p className="kicker">New single coming soon</p>
+            <h1>Irena Pasternak</h1>
+            <p className="sub">
+              Cinematic Russian pop. Warm. Intimate. Golden hour.
+            </p>
+            <div className="ctaRow">
+              <a className="btn primary" href="#newsletter">Get notified</a>
+              <a className="btn ghost" href="#music">Listen</a>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="music">
+          <h2>Music</h2>
+          <p className="muted">Add official links when ready.</p>
+          <div className="links">
+            <a className="card" href="#" onClick={(e) => e.preventDefault()}>Spotify</a>
+            <a className="card" href="#" onClick={(e) => e.preventDefault()}>YouTube</a>
+            <a className="card" href="#" onClick={(e) => e.preventDefault()}>Instagram</a>
+            <a className="card" href="#" onClick={(e) => e.preventDefault()}>TikTok</a>
+          </div>
+        </section>
+
+        <section className="section" id="about">
+          <h2>About</h2>
           <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+            Short bio goes here. 2–3 sentences in English for the first version.
           </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+        </section>
 
-      <div className="ticks"></div>
+        <section className="section" id="newsletter">
+          <h2>Stay close</h2>
+          <p className="muted">
+            For now this is a placeholder button. Later we’ll connect a real mailing list.
+          </p>
+          <button className="btn primary" type="button">
+            Notify me
+          </button>
+        </section>
+      </main>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <footer className="footer">
+        <div className="muted">© {new Date().getFullYear()} Irena Pasternak</div>
+      </footer>
+    </div>
+  );
 }
-
-export default App
