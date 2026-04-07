@@ -62,7 +62,6 @@
     flex-direction: row;
     gap: 12px;
   }
-
   .socialIcon {
     width: 42px;
     height: 42px;
@@ -74,7 +73,6 @@
     bottom: calc(14px + env(safe-area-inset-bottom) + 118px);
     gap: 10px;
   }
-
   .socialIcon {
     width: 40px;
     height: 40px;
@@ -207,4 +205,36 @@
   height: 1px;
   background: rgba(245, 237, 224, 0.14);
   margin: 16px 0;
+}
+
+/* =========================
+   Legal corner button — desktop only
+   ========================= */
+.legalCornerBtn {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  z-index: 20;
+  background: none;
+  border: none;
+  color: rgba(245, 237, 224, 0.45);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 200ms var(--easeOut);
+}
+
+.legalCornerBtn:hover {
+  color: rgba(245, 237, 224, 0.85);
+}
+
+/* Hidden on mobile — Legal is in the hamburger menu */
+@media (max-width: 720px) {
+  .legalCornerBtn {
+    display: none;
+  }
 }

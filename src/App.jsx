@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles/index.css";
-
 import coverImg from "./assets/cover.png";
 import logoImg from "./assets/Ira-logo.png";
 
@@ -96,7 +95,6 @@ function Icon({ name }) {
 
 function Modal({ open, title, onClose, children }) {
   const overlayRef = useRef(null);
-
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e) => {
@@ -105,9 +103,7 @@ function Modal({ open, title, onClose, children }) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, onClose]);
-
   if (!open) return null;
-
   return (
     <div
       className="modalOverlay"
@@ -148,39 +144,30 @@ export default function App() {
   const [bioOpen, setBioOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
-
-  const [lang, setLang] = useState("ru"); // ברירת מחדל: רוסית
+  const [lang, setLang] = useState("ru");
   const [dir, setDir] = useState("ltr");
   const [copy, setCopy] = useState({});
   const [copyStatus, setCopyStatus] = useState("loading");
-
   const [nextSong, setNextSong] = useState(null);
   const [nextSongStatus, setNextSongStatus] = useState("loading");
-
   const [emailOpen, setEmailOpen] = useState(false);
   const [reminderEmail, setReminderEmail] = useState("");
   const [consent, setConsent] = useState(false);
   const [reminderStatus, setReminderStatus] = useState("idle");
   const reminderInputRef = useRef(null);
-
   const closeMenu = () => setMenuOpen(false);
 
   function setLangEverywhere(nextLang, { close = false, source = "ui" } = {}) {
     const normalized = normalizeLang(nextLang) || "ru";
     setLang(normalized);
-
-    // מעדכן URL כדי שאפשר יהיה להעתיק/לשתף
-    // אם הגיע מלינק חיצוני - נשמר; אם הגיע מכפתור - נעדכן
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
       url.searchParams.set("lang", normalized);
       window.history.replaceState({}, "", url);
     }
-
     if (close) closeMenu();
   }
 
-  // 1) טעינה ראשונה: אם יש ?lang=... ב-URL, זה מנצח ברירת מחדל
   useEffect(() => {
     try {
       const url = new URL(window.location.href);
@@ -188,7 +175,6 @@ export default function App() {
       if (qLang) {
         setLang(qLang);
       } else {
-        // אם אין, נכתוב ברירת מחדל ל-URL כדי שאפשר יהיה להעתיק מיד
         url.searchParams.set("lang", "ru");
         window.history.replaceState({}, "", url);
       }
@@ -205,14 +191,12 @@ export default function App() {
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadCopy(currentLang) {
       try {
         setCopyStatus("loading");
         const res = await fetch(`/api/site-copy?lang=${encodeURIComponent(currentLang)}`);
         const data = await res.json();
         if (!res.ok || !data?.ok) throw new Error("bad_copy");
-
         if (!cancelled) {
           setCopy(data.copy || {});
           setDir(data.dir || (currentLang === "he" ? "rtl" : "ltr"));
@@ -222,16 +206,12 @@ export default function App() {
         if (!cancelled) setCopyStatus("error");
       }
     }
-
     loadCopy(lang);
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [lang]);
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadNextSong() {
       try {
         setNextSongStatus("loading");
@@ -246,11 +226,8 @@ export default function App() {
         if (!cancelled) setNextSongStatus("error");
       }
     }
-
     loadNextSong();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -265,16 +242,13 @@ export default function App() {
     e.preventDefault();
     const email = reminderEmail.trim();
     if (!email) return;
-
     if (!consent) {
       setReminderStatus("error");
       return;
     }
-
     try {
       setReminderStatus("sending");
       const songTitle = nextSong?.title || "";
-
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -286,7 +260,6 @@ export default function App() {
           consentVersion: "v1",
         }),
       });
-
       if (!res.ok) throw new Error("bad_response");
       setReminderStatus("success");
     } catch {
@@ -298,14 +271,14 @@ export default function App() {
     return {
       comingSoon: pick(copy, "banner.comingSoon", "Coming soon"),
       reminder: pick(copy, "banner.reminder", "Reminder:"),
-      dontMiss: pick(copy, "email.cta", "Don’t miss release day"),
+      dontMiss: pick(copy, "email.cta", "Don't miss release day"),
       getReminder: pick(copy, "email.button", "Get reminder"),
       sending: pick(copy, "email.sending", "Sending…"),
       saved: pick(copy, "email.saved", "Saved"),
       close: pick(copy, "email.close", "Close"),
       thanksTitle: pick(copy, "email.thanksTitle", "Thank you"),
-      thanksText: pick(copy, "email.thanksText", "You’ll be among the first to hear the new release."),
-      consentText: pick(copy, "email.consentText", "I agree to receive emails from Irena Pasternak, according to the site’s"),
+      thanksText: pick(copy, "email.thanksText", "You'll be among the first to hear the new release."),
+      consentText: pick(copy, "email.consentText", "I agree to receive emails from Irena Pasternak, according to the site's"),
       privacyLinkText: pick(copy, "legal.privacyLinkText", "Privacy Policy"),
       legalTitle: pick(copy, "legal.title", "Legal"),
       lastUpdated: pick(copy, "legal.lastUpdated", "Last updated: 2026-04-06"),
@@ -333,40 +306,30 @@ export default function App() {
             <img className="navLogo" src={logoImg} alt="" />
             <span className="brandScript">
               {lang === "ru" ? "Ирина Пастернак" : "Irena Pasternak"}
-            </span>          </a>
-
+            </span>
+          </a>
           <nav className={`navLinks ${menuOpen ? "open" : ""}`} aria-label="Main">
             <button className="navLinkBtn" type="button" onClick={closeMenu}>
               {pick(copy, "nav.home", "Home")}
             </button>
-
             <button
               className="navLinkBtn"
               type="button"
-              onClick={() => {
-                setBioOpen(true);
-                closeMenu();
-              }}
+              onClick={() => { setBioOpen(true); closeMenu(); }}
             >
               {pick(copy, "nav.bio", "Bio")}
             </button>
-
             <button
               className="navLinkBtn"
               type="button"
-              onClick={() => {
-                setContactOpen(true);
-                closeMenu();
-              }}
+              onClick={() => { setContactOpen(true); closeMenu(); }}
             >
               {pick(copy, "nav.contact", "Contact")}
             </button>
-
             {menuOpen && (
               <>
                 <div className="navDivider" />
                 <div className="navSectionTitle">Language</div>
-
                 <div className="lang langInMenu" aria-label="Language">
                   <button
                     type="button"
@@ -390,23 +353,17 @@ export default function App() {
                     🇮🇱 HE
                   </button>
                 </div>
-
                 <div className="navDivider" />
-
                 <button
                   className="navLinkBtn"
                   type="button"
-                  onClick={() => {
-                    setLegalOpen(true);
-                    closeMenu();
-                  }}
+                  onClick={() => { setLegalOpen(true); closeMenu(); }}
                 >
                   {t.legalTitle}
                 </button>
               </>
             )}
           </nav>
-
           <div className="navRight">
             <div className="lang langTop" aria-label="Language">
               <button
@@ -431,7 +388,6 @@ export default function App() {
                 🇮🇱 HE
               </button>
             </div>
-
             <button
               className="iconBtn burger"
               type="button"
@@ -470,17 +426,13 @@ export default function App() {
               <div className="comingCover">
                 <img className="coverImg" src={coverImg} alt="Next release cover" />
               </div>
-
               <div className="comingInfo">
                 <div className="comingTopLine">
                   <span className="comingTitle">{t.comingSoon}</span>
                   <span className="comingDate">{bannerDate}</span>
                 </div>
-
                 <div className="comingSub">{pick(copy, "banner.subtitle", "New single is almost here")}</div>
-
                 <div className="ctaAbove">{t.reminder}</div>
-
                 <div className="remindRow" role="group" aria-label="Choose reminder">
                   <a
                     className="remindBtn yt"
@@ -489,15 +441,10 @@ export default function App() {
                     rel="noreferrer"
                     aria-label="YouTube reminder"
                     aria-disabled={disableButtons ? "true" : "false"}
-                    onClick={(e) => {
-                      if (disableButtons || ytUrl === "#") e.preventDefault();
-                    }}
+                    onClick={(e) => { if (disableButtons || ytUrl === "#") e.preventDefault(); }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="youtube" />
-                    </span>
+                    <span className="remindIcon"><Icon name="youtube" /></span>
                   </a>
-
                   <a
                     className="remindBtn sp"
                     href={spUrl}
@@ -505,34 +452,22 @@ export default function App() {
                     rel="noreferrer"
                     aria-label="Spotify pre-save"
                     aria-disabled={disableButtons ? "true" : "false"}
-                    onClick={(e) => {
-                      if (disableButtons || spUrl === "#") e.preventDefault();
-                    }}
+                    onClick={(e) => { if (disableButtons || spUrl === "#") e.preventDefault(); }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="spotify" />
-                    </span>
+                    <span className="remindIcon"><Icon name="spotify" /></span>
                   </a>
-
                   <button
                     className="remindBtn em"
                     type="button"
                     aria-label="Email reminder"
-                    onClick={() => {
-                      setEmailOpen((v) => !v);
-                      setReminderStatus("idle");
-                    }}
+                    onClick={() => { setEmailOpen((v) => !v); setReminderStatus("idle"); }}
                   >
-                    <span className="remindIcon">
-                      <Icon name="mail" />
-                    </span>
+                    <span className="remindIcon"><Icon name="mail" /></span>
                   </button>
                 </div>
-
                 {emailOpen && (
                   <div className="emailPop" role="group" aria-label="Email reminder form">
                     <div className="emailCta">{t.dontMiss}</div>
-
                     <form className="emailForm" onSubmit={submitReminder}>
                       <input
                         ref={reminderInputRef}
@@ -547,7 +482,6 @@ export default function App() {
                         aria-label="Email"
                         disabled={reminderStatus === "success"}
                       />
-
                       <button
                         className="emailBtn"
                         type="submit"
@@ -559,7 +493,6 @@ export default function App() {
                             ? t.saved
                             : t.getReminder}
                       </button>
-
                       <label className="consentRow">
                         <input
                           className="consentBox"
@@ -577,35 +510,28 @@ export default function App() {
                           .
                         </span>
                       </label>
-
                       {reminderStatus === "success" && (
                         <div className="emailThanks">
                           <div className="emailThanksTitle">{t.thanksTitle}</div>
                           <div className="emailThanksText">{t.thanksText}</div>
                         </div>
                       )}
-
                       {reminderStatus === "error" && (
                         <div className="emailMsg err">
                           {pick(copy, "email.error", "Something went wrong. Please try again.")}
                         </div>
                       )}
-
                       <button
                         className="emailClose"
                         type="button"
-                        onClick={() => {
-                          setEmailOpen(false);
-                          setReminderStatus("idle");
-                        }}
+                        onClick={() => { setEmailOpen(false); setReminderStatus("idle"); }}
                         aria-label="Close email form"
                       >
                         {t.close}
                       </button>
-
                       {copyStatus === "error" && (
                         <div className="emailMsg err">
-                          {pick(copy, "copy.error", "Couldn’t load translations. Please refresh.")}
+                          {pick(copy, "copy.error", "Couldn't load translations. Please refresh.")}
                         </div>
                       )}
                     </form>
@@ -614,7 +540,6 @@ export default function App() {
               </div>
             </div>
           </div>
-
           <a
             className="playPill playPillSmall"
             href={LINKS.spotifyArtist}
@@ -622,12 +547,9 @@ export default function App() {
             rel="noreferrer"
             aria-label="Open Spotify artist page"
           >
-            <span className="playCircle">
-              <Icon name="play" />
-            </span>
+            <span className="playCircle"><Icon name="play" /></span>
             <span>{pick(copy, "cta.playSpotify", "Play on Spotify")}</span>
           </a>
-
           <div className="copyrightLine" aria-label="Copyright">
             © {new Date().getFullYear()} Irena Pasternak. All rights reserved.
           </div>
@@ -638,33 +560,33 @@ export default function App() {
         <p>{pick(copy, "bio.p1", "…")}</p>
         <p>{pick(copy, "bio.p2", "…")}</p>
       </Modal>
-
       <Modal open={contactOpen} title={pick(copy, "contact.title", "Contact")} onClose={() => setContactOpen(false)}>
         <p className="muted">{pick(copy, "contact.p1", "For collaborations, licensing inquiries, and bookings:")}</p>
         <p className="muted">{pick(copy, "contact.emailLine", "Email: d0503366710@gmail.com")}</p>
       </Modal>
-
       <Modal open={legalOpen} title={t.legalTitle} onClose={() => setLegalOpen(false)}>
         <p className="muted">{t.lastUpdated}</p>
-
         <h3 className="legalHeading">{t.privacyTitle}</h3>
         <p>{t.privacyBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.termsTitle}</h3>
         <p>{t.termsBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.cookiesTitle}</h3>
         <p>{t.cookiesBody}</p>
-
         <hr className="legalDivider" />
-
         <h3 className="legalHeading">{t.accTitle}</h3>
         <p>{t.accBody}</p>
-      </Modal> 
+      </Modal>
+
+      {/* Legal corner button — desktop only, hidden on mobile via CSS */}
+      <button
+        className="legalCornerBtn"
+        type="button"
+        onClick={() => setLegalOpen(true)}
+      >
+        {t.legalTitle}
+      </button>
     </div>
   );
-}
+}ד
