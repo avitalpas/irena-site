@@ -664,7 +664,7 @@ export default function App() {
 
         <h3 className="legalHeading">{t.accTitle}</h3>
         <p>{t.accBody}</p>
-      </Modal>
+      </Modal> 
     </div>
   );
 }
