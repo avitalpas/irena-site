@@ -331,8 +331,9 @@ export default function App() {
         <div className="navInner">
           <a className="brand brandWithLogo" href="#top" onClick={closeMenu} aria-label="Home">
             <img className="navLogo" src={logoImg} alt="" />
-            <span className="brandScript">Irena Pasternak</span>
-          </a>
+            <span className="brandScript">
+              {lang === "ru" ? "Ирина Пастернак" : "Irena Pasternak"}
+            </span>          </a>
 
           <nav className={`navLinks ${menuOpen ? "open" : ""}`} aria-label="Main">
             <button className="navLinkBtn" type="button" onClick={closeMenu}>
@@ -555,8 +556,8 @@ export default function App() {
                         {reminderStatus === "sending"
                           ? t.sending
                           : reminderStatus === "success"
-                          ? t.saved
-                          : t.getReminder}
+                            ? t.saved
+                            : t.getReminder}
                       </button>
 
                       <label className="consentRow">
