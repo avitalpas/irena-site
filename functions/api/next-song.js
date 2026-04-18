@@ -80,6 +80,10 @@ export async function onRequestGet(context) {
     const spUrl =
       props["Spotify pre-save URL"]?.url || null;
 
+    const coverFile = props["תמונה"]?.files?.[0];
+    const coverUrl =
+      coverFile?.file?.url || coverFile?.external?.url || null;
+
     return json(200, {
       ok: true,
       song: {
@@ -88,6 +92,7 @@ export async function onRequestGet(context) {
         releaseShort,
         ytUrl,
         spUrl,
+        coverUrl,
       },
     });
   } catch (e) {

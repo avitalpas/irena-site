@@ -296,6 +296,7 @@ export default function App() {
   const bannerDate = nextSongStatus === "ok" ? nextSong?.releaseShort || "—" : "…";
   const ytUrl = nextSongStatus === "ok" ? nextSong?.ytUrl || "#" : "#";
   const spUrl = nextSongStatus === "ok" ? nextSong?.spUrl || "#" : "#";
+  const coverUrl = nextSongStatus === "ok" ? nextSong?.coverUrl || coverImg : coverImg;
   const disableButtons = nextSongStatus !== "ok";
 
   return (
@@ -424,7 +425,7 @@ export default function App() {
           <div className="comingCard" role="group" aria-label="Coming soon">
             <div className="comingCompact">
               <div className="comingCover">
-                <img className="coverImg" src={coverImg} alt="Next release cover" />
+                <img className="coverImg" src={coverUrl} alt="Next release cover" />
               </div>
               <div className="comingInfo">
                 <div className="comingTopLine">
