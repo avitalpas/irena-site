@@ -294,8 +294,8 @@ export default function App() {
   }, [copy]);
 
   const bannerDate = nextSongStatus === "ok" ? nextSong?.releaseShort || "—" : "…";
-  const ytUrl = nextSongStatus === "ok" ? nextSong?.ytUrl || "#" : "#";
-  const spUrl = nextSongStatus === "ok" ? nextSong?.spUrl || "#" : "#";
+  const ytUrl = nextSongStatus === "ok" ? nextSong?.ytUrl || LINKS.youtubeChannel : "#";
+  const spUrl = nextSongStatus === "ok" ? nextSong?.spUrl || LINKS.spotifyArtist : "#";
   const coverUrl = nextSongStatus === "ok" ? nextSong?.coverUrl || coverImg : coverImg;
   const disableButtons = nextSongStatus !== "ok";
 
@@ -442,7 +442,7 @@ export default function App() {
                     rel="noreferrer"
                     aria-label="YouTube reminder"
                     aria-disabled={disableButtons ? "true" : "false"}
-                    onClick={(e) => { if (disableButtons || ytUrl === "#") e.preventDefault(); }}
+                    onClick={(e) => { if (disableButtons) e.preventDefault(); }}
                   >
                     <span className="remindIcon"><Icon name="youtube" /></span>
                   </a>
@@ -453,7 +453,7 @@ export default function App() {
                     rel="noreferrer"
                     aria-label="Spotify pre-save"
                     aria-disabled={disableButtons ? "true" : "false"}
-                    onClick={(e) => { if (disableButtons || spUrl === "#") e.preventDefault(); }}
+                    onClick={(e) => { if (disableButtons) e.preventDefault(); }}
                   >
                     <span className="remindIcon"><Icon name="spotify" /></span>
                   </a>
